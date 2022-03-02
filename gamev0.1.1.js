@@ -17,8 +17,8 @@ gameScene.preload = function() {
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.image('player', 'assets/knight/knight1.png')
     this.load.spritesheet('idle', 'assets/knight/knight_idle_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
-
+    this.load.spritesheet('right_run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('left_run', 'assets/knight/knight_run_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
 };
 
 gameScene.create = function() {
@@ -31,11 +31,23 @@ gameScene.create = function() {
     
     this.player = this.physics.add.sprite(100, 450, 'player');
     this.player.setScale(2);
-    
+
+    this.anims.create({
+        key:'idle',
+        frames: this.anims.generateFrameNumbers('idle', { start: 0, end: 5 }),
+        frameRate:10,
+        repeat: 0
+    });
     
     this.anims.create({
-        key:'run',
-        frames: this.anims.generateFrameNumbers('run', { start: 0, end: 5 }),
+        key:'right_run',
+        frames: this.anims.generateFrameNumbers('right_run', { start: 0, end: 5 }),
+        frameRate:10,
+        repeat: 0
+    });
+    this.anims.create({
+        key:'left_run',
+        frames: this.anims.generateFrameNumbers('left_run', { start: 0, end: 5 }),
         frameRate:10,
         repeat: 0
     });
@@ -53,16 +65,19 @@ gameScene.update = function() {
     
     if (this.cursors.right.isDown) {
         this.player.x += this.playerSpeed;
-		this.player.anims.play('run', true);
+		this.player.anims.play('right_run', true);
     } else if (this.cursors.left.isDown) {
         this.player.x -= this.playerSpeed;
-		this.player.anims.play('run', true);
+		this.player.anims.play('left_run', true);
     } else if (this.cursors.up.isDown) {
         this.player.y -= this.playerSpeed;
-		this.player.anims.play('run', true);
+		this.player.anims.play('right_run', true);
     } else if (this.cursors.down.isDown) {
         this.player.y += this.playerSpeed;
-		this.player.anims.play('run', true);
+		this.player.anims.play('right_run', true);
+    }
+    else{
+        this.player.anims.play('idle', true);
     }
 
 }
