@@ -8,6 +8,7 @@ gameScene.init = function() {
 
     this.player;
     this.playerSpeed = 1.5;
+    x=1;
 
 };
 
@@ -16,7 +17,8 @@ gameScene.preload = function() {
     this.load.tilemapTiledJSON('map', 'assets/demo_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.image('player', 'assets/knight/knight1.png')
-    this.load.spritesheet('idle', 'assets/knight/knight_idle_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('idle_right', 'assets/knight/knight_idle_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('idle_left', 'assets/knight/knight_idle_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('right_run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('left_run', 'assets/knight/knight_run_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
 };
@@ -33,8 +35,15 @@ gameScene.create = function() {
     this.player.setScale(2);
 
     this.anims.create({
-        key:'idle',
-        frames: this.anims.generateFrameNumbers('idle', { start: 0, end: 5 }),
+        key:'idle_right',
+        frames: this.anims.generateFrameNumbers('idle_right', { start: 0, end: 5 }),
+        frameRate:10,
+        repeat: 0
+    });
+
+    this.anims.create({
+        key:'idle_left',
+        frames: this.anims.generateFrameNumbers('idle_left', { start: 0, end: 5 }),
         frameRate:10,
         repeat: 0
     });
@@ -56,6 +65,7 @@ gameScene.create = function() {
     
     this.physics.add.collider(this.player, layer1);   
 
+    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
 }
 
 
@@ -66,18 +76,43 @@ gameScene.update = function() {
     if (this.cursors.right.isDown) {
         this.player.x += this.playerSpeed;
 		this.player.anims.play('right_run', true);
+        x=1;
+        tutorialText.setVisible(false);
     } else if (this.cursors.left.isDown) {
         this.player.x -= this.playerSpeed;
 		this.player.anims.play('left_run', true);
+        x=0;
+        tutorialText.setVisible(false);
     } else if (this.cursors.up.isDown) {
         this.player.y -= this.playerSpeed;
+        if (x==1){
 		this.player.anims.play('right_run', true);
+        tutorialText.setVisible(false);
+        }
+        else if (x==0) {
+            this.player.anims.play('left_run', true);
+            tutorialText.setVisible(false);
+        }
     } else if (this.cursors.down.isDown) {
         this.player.y += this.playerSpeed;
-		this.player.anims.play('right_run', true);
+        if (x==1){
+            this.player.anims.play('right_run', true);
+            tutorialText.setVisible(false);
+            }
+            else if (x==0) {
+                this.player.anims.play('left_run', true);
+                tutorialText.setVisible(false);
+            }
     }
     else{
-        this.player.anims.play('idle', true);
+        if (x==1){
+        this.player.anims.play('idle_right', true);
+        console.log(x)
+        }
+        else if (x==0){
+            this.player.anims.play('idle_left', true);
+            console.log(x);
+        }
     }
 
 }
