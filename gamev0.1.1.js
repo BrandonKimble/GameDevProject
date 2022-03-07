@@ -7,6 +7,7 @@ let gameScene = new Phaser.Scene('Game');
 gameScene.init = function() {
 
     this.player;
+    this.enemy;
     this.playerSpeed = 1.5;
     x=1;
 
@@ -16,7 +17,9 @@ gameScene.preload = function() {
 
     this.load.tilemapTiledJSON('map', 'assets/demo_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
-    this.load.image('player', 'assets/knight/knight1.png')
+    this.load.image('player', 'assets/knight/knight1.png');
+    this.load.spritesheet('minotaur_idle', 'assets/minotaur_idle.png', { frameWidth: 95, frameHeight: 96 });
+
     this.load.spritesheet('idle_right', 'assets/knight/knight_idle_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('idle_left', 'assets/knight/knight_idle_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('right_run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
@@ -34,6 +37,9 @@ gameScene.create = function() {
     this.player = this.physics.add.sprite(100, 450, 'player');
     this.player.setScale(2);
 
+
+    this.enemy = this.physics.add.sprite(400, 450, 'minotaur_idle');
+
     this.anims.create({
         key:'idle_right',
         frames: this.anims.generateFrameNumbers('idle_right', { start: 0, end: 5 }),
@@ -42,6 +48,14 @@ gameScene.create = function() {
     });
 
     this.anims.create({
+        key:'idle_right',
+        frames: this.anims.generateFrameNumbers('idle_right', { start: 0, end: 5 }),
+        frameRate:10,
+        repeat: 0
+    });
+
+    this.anims.create({
+
         key:'idle_left',
         frames: this.anims.generateFrameNumbers('idle_left', { start: 0, end: 5 }),
         frameRate:10,
@@ -60,10 +74,18 @@ gameScene.create = function() {
         frameRate:10,
         repeat: 0
     });
+
+    this.anims.create({
+        key:'minotaur',
+        frames: this.anims.generateFrameNumbers('minotaur_idle', { start: 0, end: 4 }),
+        frameRate:10,
+        repeat: 0
+    });
     
     this.cursors = this.input.keyboard.createCursorKeys();
     
-    this.physics.add.collider(this.player, layer1);   
+
+    this.physics.add.collider(this.player, layer1);    
 
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
 }
@@ -72,6 +94,10 @@ gameScene.create = function() {
 gameScene.update = function() {
 
 	this.player.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player, this.player2); 
+       
+
+    this.enemy.anims.play('minotaur', true);
     
     if (this.cursors.right.isDown) {
         this.player.x += this.playerSpeed;
@@ -107,6 +133,10 @@ gameScene.update = function() {
     else{
         if (x==1){
         this.player.anims.play('idle_right', true);
+
+        }
+        else if (x==0){
+            this.player.anims.play('idle_left', true)
         console.log(x)
         }
         else if (x==0){
