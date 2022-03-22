@@ -14,7 +14,7 @@ gameScene.init = function() {
 
 gameScene.preload = function() {
 
-    this.load.tilemapTiledJSON('map', 'assets/demo_map.json');
+    this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.image('player', 'assets/knight/knight1.png');
     this.load.spritesheet('minotaur_idle', 'assets/minotaur_idle.png', { frameWidth: 95, frameHeight: 96 });
@@ -26,30 +26,32 @@ gameScene.preload = function() {
 };
 
 gameScene.create = function() {
-
-    this.map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
-    this.tileset = this.map.addTilesetImage('tileset-images', 'tiles');
-    this.floor = this.map.createLayer('Floors', this.tileset, 0,0)
-    this.stairs = this.map.createLayer('Stairs', this.tileset, 0,0);
-    this.walls = this.map.createDynamicLayer('Walls/Holes', this.tileset, 0,0);
-    this.walls.setCollisionByProperty({ collides: true });
-    // this.physics.add.collider(this.player, this.walls, null, null, this);
-    
-    this.player = this.physics.add.sprite(100, 450, 'player');
-    this.player.setScale(2.25);
-    // this.player.setBounce(1)
-
-    this.enemy = this.physics.add.sprite(400, 450, 'minotaur_idle');
-    this.enemy.setScale(1.25);
+	
+    const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
+    const tileset = map.addTilesetImage('dungeon', 'tiles');
+    const stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
+    const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
+    const stairs = map.createLayer('Stairs', tileset, 0,0);
+    const walls = map.createLayer('Walls', tileset, 0,0);
+    const extra = map.createLayer('Extra', tileset, 0,0);
     
     
-    this.physics.add.collider(this.player, this.enemy); 
-
     
-
-    this.cursors = this.input.keyboard.createCursorKeys();
-
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
+    this.player = this.physics.add.sprite(100, 125, 'player');
+    this.player.setScale(2);
+    
+    this.physics.add.collider(this.player, walls);
+    walls.setCollisionByProperty({ collides: true });
+    
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+    walls.renderDebug(debugGraphics, {
+        tileColor: null, // Color of non-colliding tiles
+        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+        faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
+    
+    this.enemy = this.physics.add.sprite(400, 125, 'minotaur_idle');
+    this.physics.add.collider(this.player, this.enemy);
 
     this.anims.create({
         key:'idle_right',
@@ -57,7 +59,7 @@ gameScene.create = function() {
         frameRate:10,
         repeat: 0
     });
-    
+
     this.anims.create({
         key:'idle_right',
         frames: this.anims.generateFrameNumbers('idle_right', { start: 0, end: 5 }),
@@ -79,37 +81,29 @@ gameScene.create = function() {
         frameRate:10,
         repeat: 0
     });
-
     this.anims.create({
         key:'left_run',
         frames: this.anims.generateFrameNumbers('left_run', { start: 0, end: 5 }),
         frameRate:10,
         repeat: 0
     });
-    
+
     this.anims.create({
         key:'minotaur',
         frames: this.anims.generateFrameNumbers('minotaur_idle', { start: 0, end: 4 }),
         frameRate:10,
         repeat: 0
     });
-};
+    
+    this.cursors = this.input.keyboard.createCursorKeys();    
 
-
-gameScene.showDebugWalls = function() {
-        const debugGraphics = this.add.graphics().setAlpha(0.7);
-        this.walls.renderDebug(debugGraphics, {
-            tileColor: null,
-            collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
-        });
-    };
+    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
+}
 
 
 gameScene.update = function() {
-    this.showDebugWalls();
 
 	this.player.setCollideWorldBounds(true);
-    this.enemy.anims.play('minotaur', true);
     
     if (this.cursors.right.isDown) {
         this.player.setVelocity(50, 0);
@@ -155,8 +149,8 @@ gameScene.update = function() {
 
 const config = {
 	type: Phaser.AUTO,
-	width: 670,
-	height: 640,
+	width: 1650,
+	height: 225,
 	scene: gameScene,
 	physics: {
 		default: 'arcade',
