@@ -8,7 +8,6 @@ gameScene.init = function() {
     this.player;
     this.enemy;
     this.direction;
-   
 
 };
 
@@ -23,6 +22,7 @@ gameScene.preload = function() {
     this.load.spritesheet('idle_left', 'assets/knight/knight_idle_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('right_run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('left_run', 'assets/knight/knight_run_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
+    
 };
 
 gameScene.create = function() {
@@ -104,6 +104,8 @@ gameScene.create = function() {
 gameScene.update = function() {
 
 	this.player.setCollideWorldBounds(true);
+    this.enemy.anims.play('minotaur', true);
+    this.player.anims.play('idle_right', true);
     
     if (this.cursors.right.isDown) {
         this.player.setVelocity(50, 0);
