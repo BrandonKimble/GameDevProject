@@ -112,9 +112,12 @@ gameScene.create = function() {
     });
     let healthBar = new HealthBar(gameScene, 20 , 200);
     this.enemy = this.physics.add.sprite(400, 125, 'minotaur_idle');
+    let myScene = this.scene
     this.physics.add.collider(this.player, this.enemy, function(){
-        healthBar.decrease(10);
-        
+        let dead = healthBar.decrease(10);
+        if(dead){
+            myScene.restart();       
+        }
     });
 
     this.anims.create({
