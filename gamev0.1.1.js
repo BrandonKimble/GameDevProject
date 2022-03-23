@@ -1,6 +1,67 @@
-
-
 let gameScene = new Phaser.Scene('Game');
+
+
+class HealthBar {
+
+    constructor (gameScene, x, y)
+    {
+        this.bar = new Phaser.GameObjects.Graphics(gameScene);
+
+        this.x = x;
+        this.y = y;
+        this.value = 500;
+        this.p = 295 / 500;
+
+        this.draw();
+
+        gameScene.add.existing(this.bar);
+    }
+
+    decrease (amount)
+    {
+        this.value -= amount;
+
+        if (this.value < 0)
+        {
+            this.value = 0;
+        }
+
+        this.draw();
+
+        return (this.value === 0);
+    }
+
+    draw ()
+    {
+        this.bar.clear();
+
+        //  BG
+        this.bar.fillStyle(0x000000);
+        this.bar.fillRect(this.x, this.y, 300, 16);
+
+        //  Health
+
+        this.bar.fillStyle(0xffffff);
+        this.bar.fillRect(this.x + 2, this.y + 2, 295, 12);
+
+        if (this.value < 100)
+        {
+            this.bar.fillStyle(0xff0000);
+        }
+        else
+        {
+            this.bar.fillStyle(0x00ff00);
+        }
+
+        var d = Math.floor(this.p * this.value);
+
+        this.bar.fillRect(this.x + 2, this.y + 2, d, 12);
+    }
+
+}
+
+
+
 
 
 gameScene.init = function() {
@@ -8,6 +69,8 @@ gameScene.init = function() {
     this.player;
     this.enemy;
     this.direction;
+    this.healthBar;
+    this.health;
 
 };
 
@@ -34,9 +97,7 @@ gameScene.create = function() {
     const stairs = map.createLayer('Stairs', tileset, 0,0);
     const walls = map.createLayer('Walls', tileset, 0,0);
     const extra = map.createLayer('Extra', tileset, 0,0);
-    
-    
-    
+        
     this.player = this.physics.add.sprite(100, 125, 'player');
     this.player.setScale(2);
     
@@ -49,9 +110,12 @@ gameScene.create = function() {
         collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
         faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
     });
-    
+    let healthBar = new HealthBar(gameScene, 20 , 200);
     this.enemy = this.physics.add.sprite(400, 125, 'minotaur_idle');
-    this.physics.add.collider(this.player, this.enemy);
+    this.physics.add.collider(this.player, this.enemy, function(){
+        healthBar.decrease(10);
+        
+    });
 
     this.anims.create({
         key:'idle_right',
@@ -99,21 +163,14 @@ gameScene.create = function() {
 
 
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
-
-    //make health bar
-    let healthBar=this.makeBar(20,100,0x2ecc71);
- 
-    this.setValue(healthBar,100);
-
 }
 
 
 gameScene.update = function() {
-
-
-
+    
+    this.enemyFollows();
 	this.player.setCollideWorldBounds(true);
-    this.enemy.anims.play('minotaur', true);
+    //this.enemy.anims.play('minotaur', true);
     this.player.anims.play('idle_right', true);
     
     if (this.cursors.right.isDown) {
@@ -149,6 +206,7 @@ gameScene.update = function() {
         }
         
     } else {
+        this.player.setVelocity(0, 0);
         if (this.direction == 1) {
             this.player.anims.play('idle_right', true);
         } else if (this.direction == -1) {
@@ -157,28 +215,8 @@ gameScene.update = function() {
     };
 };
 
-
-gameScene.makeBar = function(x,y,color){
-    //draw the bar
-    let bar = this.add.graphics();
-
-    //color the bar
-    bar.fillStyle(color, 1);
-
-    //fill the bar with a rectangle
-    bar.fillRect(0, 0, 200, 50);
-    
-    //position the bar
-    bar.x = x;
-    bar.y = y;
-
-    //return the bar
-    return bar;
-};
-
-gameScene.setValue = function(bar,percentage) {
-    //scale the bar
-    bar.scaleX = percentage/100;
+gameScene.enemyFollows = function() {
+    this.physics.moveToObject(this.enemy, this.player, 20);
 }
 
 const config = {
