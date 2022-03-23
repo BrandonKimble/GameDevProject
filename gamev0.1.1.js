@@ -1,6 +1,5 @@
 
 
-
 let gameScene = new Phaser.Scene('Game');
 
 
@@ -8,14 +7,13 @@ gameScene.init = function() {
 
     this.player;
     this.enemy;
-    this.playerSpeed = 1.5;
-    x=1;
+    this.direction;
 
 };
 
 gameScene.preload = function() {
 
-    this.load.tilemapTiledJSON('map', 'assets/demo_map.json');
+    this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.image('player', 'assets/knight/knight1.png');
     this.load.spritesheet('minotaur_idle', 'assets/minotaur_idle.png', { frameWidth: 95, frameHeight: 96 });
@@ -24,21 +22,36 @@ gameScene.preload = function() {
     this.load.spritesheet('idle_left', 'assets/knight/knight_idle_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('right_run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('left_run', 'assets/knight/knight_run_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
+    
 };
 
 gameScene.create = function() {
 	
     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
-    const tileset = map.addTilesetImage('dungeon tiles', 'tiles');
-    const layer3 = map.createLayer('Floors', tileset, 0,0)
-    const layer2 = map.createLayer('Stairs', tileset, 0,0);
-    const layer1 = map.createLayer('Walls/Holes', tileset, 0,0);
+    const tileset = map.addTilesetImage('dungeon', 'tiles');
+    const stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
+    const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
+    const stairs = map.createLayer('Stairs', tileset, 0,0);
+    const walls = map.createLayer('Walls', tileset, 0,0);
+    const extra = map.createLayer('Extra', tileset, 0,0);
     
-    this.player = this.physics.add.sprite(100, 450, 'player');
+    
+    
+    this.player = this.physics.add.sprite(100, 125, 'player');
     this.player.setScale(2);
-
-
-    this.enemy = this.physics.add.sprite(400, 450, 'minotaur_idle');
+    
+    this.physics.add.collider(this.player, walls);
+    walls.setCollisionByProperty({ collides: true });
+    
+    const debugGraphics = this.add.graphics().setAlpha(0.75);
+    walls.renderDebug(debugGraphics, {
+        tileColor: null, // Color of non-colliding tiles
+        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
+        faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
+    });
+    
+    this.enemy = this.physics.add.sprite(400, 125, 'minotaur_idle');
+    this.physics.add.collider(this.player, this.enemy);
 
     this.anims.create({
         key:'idle_right',
@@ -81,12 +94,12 @@ gameScene.create = function() {
         frameRate:10,
         repeat: 0
     });
-    
+ 
     this.cursors = this.input.keyboard.createCursorKeys();
-    
 
     this.physics.add.collider(this.player, layer1);    
     this.physics.add.collider(this.player, this.enemy); 
+
 
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
 
@@ -103,58 +116,50 @@ gameScene.update = function() {
 
 
 	this.player.setCollideWorldBounds(true);
-    this.physics.add.collider(this.player, this.player2); 
-       
-
     this.enemy.anims.play('minotaur', true);
+    this.player.anims.play('idle_right', true);
     
     if (this.cursors.right.isDown) {
-        this.player.x += this.playerSpeed;
+        this.player.setVelocity(50, 0);
 		this.player.anims.play('right_run', true);
-        x=1;
+        this.direction = 1;
         tutorialText.setVisible(false);
+
     } else if (this.cursors.left.isDown) {
-        this.player.x -= this.playerSpeed;
+        this.player.setVelocity(-50, 0);
 		this.player.anims.play('left_run', true);
-        x=0;
+        this.direction = -1;
         tutorialText.setVisible(false);
+
     } else if (this.cursors.up.isDown) {
-        this.player.y -= this.playerSpeed;
-        if (x==1){
-		this.player.anims.play('right_run', true);
+        this.player.setVelocity(0, -50);
         tutorialText.setVisible(false);
-        }
-        else if (x==0) {
-            this.player.anims.play('left_run', true);
-            tutorialText.setVisible(false);
-        }
-    } else if (this.cursors.down.isDown) {
-        this.player.y += this.playerSpeed;
-        if (x==1){
+
+        if (this.direction == 1) {
             this.player.anims.play('right_run', true);
-            tutorialText.setVisible(false);
-            }
-            else if (x==0) {
-                this.player.anims.play('left_run', true);
-                tutorialText.setVisible(false);
-            }
-    }
-    else{
-        if (x==1){
-        this.player.anims.play('idle_right', true);
-
+        } else if (this.direction == -1) {
+            this.player.anims.play('left_run', true);
         }
-        else if (x==0){
+
+    } else if (this.cursors.down.isDown) {
+        this.player.setVelocity(0, 50);
+        tutorialText.setVisible(false);
+
+        if (this.direction == 1) {
+            this.player.anims.play('right_run', true);
+        } else if (this.direction == -1) {
+            this.player.anims.play('left_run', true);
+        }
+        
+    } else {
+        if (this.direction == 1) {
+            this.player.anims.play('idle_right', true);
+        } else if (this.direction == -1) {
             this.player.anims.play('idle_left', true)
-        console.log(x)
         }
-        else if (x==0){
-            this.player.anims.play('idle_left', true);
-            console.log(x);
-        }
-    }
+    };
+};
 
-}
 
 gameScene.makeBar = function(x,y,color){
     //draw the bar
@@ -181,8 +186,8 @@ gameScene.setValue = function(bar,percentage) {
 
 const config = {
 	type: Phaser.AUTO,
-	width: 670,
-	height: 640,
+	width: 1650,
+	height: 225,
 	scene: gameScene,
 	physics: {
 		default: 'arcade',
