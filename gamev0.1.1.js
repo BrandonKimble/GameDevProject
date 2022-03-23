@@ -97,9 +97,6 @@ gameScene.create = function() {
  
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    this.physics.add.collider(this.player, layer1);    
-    this.physics.add.collider(this.player, this.enemy); 
-
 
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
 
