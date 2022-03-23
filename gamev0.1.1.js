@@ -6,7 +6,7 @@ let gameScene = new Phaser.Scene('Game');
 gameScene.init = function() {
 
     this.player;
-    this.enemy;
+    this.minotaur;
     this.direction;
 
 };
@@ -15,17 +15,55 @@ gameScene.preload = function() {
 
     this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
-    this.load.image('player', 'assets/knight/knight1.png');
-    this.load.spritesheet('minotaur_idle', 'assets/minotaur_idle.png', { frameWidth: 95, frameHeight: 96 });
+    this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
+    this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
 
-    this.load.spritesheet('idle_right', 'assets/knight/knight_idle_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('idle_left', 'assets/knight/knight_idle_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('right_run', 'assets/knight/knight_run_spritesheet.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('left_run', 'assets/knight/knight_run_spritesheet2.png', { frameWidth: 16, frameHeight: 16 });
-    
+    this.load.json('characters', 'assets/characters.json')
 };
 
 gameScene.create = function() {
+    
+    this.anims.create({
+        key: 'player_idle',
+        frameRate: 10,
+        frames: this.anims.generateFrameNames('player', { 
+            start: 1, 
+            end: 5, 
+            prefix: 'knight_idle_anim_f',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'minotaur_idle',
+        frameRate: 10,
+        frames: this.anims.generateFrameNames('minotaur', { 
+            start: 0, 
+            end: 4, 
+            prefix: 'tile00',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });
+    
+    this.anims.create({
+        key: 'player_run',
+        frameRate: 10,
+        frames: this.anims.generateFrameNames('player', {
+            start: 0,
+            end: 5,
+            prefix: 'knight_run_anim_f',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });
+
+    this.matter.world.disableGravity();
+
+    characters = this.cache.json.get("characters")
+
+    this.cursors = this.input.keyboard.createCursorKeys();
 	
     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
     const tileset = map.addTilesetImage('dungeon', 'tiles');
@@ -35,151 +73,85 @@ gameScene.create = function() {
     const walls = map.createLayer('Walls', tileset, 0,0);
     const extra = map.createLayer('Extra', tileset, 0,0);
     
-    
-    
-    this.player = this.physics.add.sprite(100, 125, 'player');
-    this.player.setScale(2);
-    
-    this.physics.add.collider(this.player, walls);
     walls.setCollisionByProperty({ collides: true });
+    this.matter.world.convertTilemapLayer(walls);
+
+    this.player = this.matter.add.sprite(100, 125, 'player', 'knight', {characters: characters.knight})
+        .setScale(2)
+        .play('player_idle')
+        .setFixedRotation();
     
-    const debugGraphics = this.add.graphics().setAlpha(0.75);
-    walls.renderDebug(debugGraphics, {
-        tileColor: null, // Color of non-colliding tiles
-        collidingTileColor: new Phaser.Display.Color(243, 134, 48, 255), // Color of colliding tiles
-        faceColor: new Phaser.Display.Color(40, 39, 37, 255) // Color of colliding face edges
-    });
+        
+    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur', 'minotaur', {characters: characters.minotaur})
+        .play('minotaur_idle')
+        .setFixedRotation();
     
-    this.enemy = this.physics.add.sprite(400, 125, 'minotaur_idle');
-    this.physics.add.collider(this.player, this.enemy);
-
-    this.anims.create({
-        key:'idle_right',
-        frames: this.anims.generateFrameNumbers('idle_right', { start: 0, end: 5 }),
-        frameRate:10,
-        repeat: 0
-    });
-
-    this.anims.create({
-        key:'idle_right',
-        frames: this.anims.generateFrameNumbers('idle_right', { start: 0, end: 5 }),
-        frameRate:10,
-        repeat: 0
-    });
-
-    this.anims.create({
-
-        key:'idle_left',
-        frames: this.anims.generateFrameNumbers('idle_left', { start: 0, end: 5 }),
-        frameRate:10,
-        repeat: 0
-    });
-    
-    this.anims.create({
-        key:'right_run',
-        frames: this.anims.generateFrameNumbers('right_run', { start: 0, end: 5 }),
-        frameRate:10,
-        repeat: 0
-    });
-    this.anims.create({
-        key:'left_run',
-        frames: this.anims.generateFrameNumbers('left_run', { start: 0, end: 5 }),
-        frameRate:10,
-        repeat: 0
-    });
-
-    this.anims.create({
-        key:'minotaur',
-        frames: this.anims.generateFrameNumbers('minotaur_idle', { start: 0, end: 4 }),
-        frameRate:10,
-        repeat: 0
-    });
- 
-    this.cursors = this.input.keyboard.createCursorKeys();
-
 
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
 
-    //make health bar
-    let healthBar=this.makeBar(20,100,0x2ecc71);
+    // make health bar
+    // let healthBar = this.makeBar(20,100,0x2ecc71);
  
-    this.setValue(healthBar,100);
+    // this.setValue(healthBar,100);
 
 }
 
 
 gameScene.update = function() {
 
-
-
-	this.player.setCollideWorldBounds(true);
-    this.enemy.anims.play('minotaur', true);
-    this.player.anims.play('idle_right', true);
+    let speed = 3;
     
     if (this.cursors.right.isDown) {
-        this.player.setVelocity(50, 0);
-		this.player.anims.play('right_run', true);
-        this.direction = 1;
+        this.player.flipX = false
+        this.player.setVelocityX(speed);
+		this.player.play('player_run', true);
         tutorialText.setVisible(false);
 
     } else if (this.cursors.left.isDown) {
-        this.player.setVelocity(-50, 0);
-		this.player.anims.play('left_run', true);
-        this.direction = -1;
+        this.player.flipX = true
+        this.player.setVelocityX(-speed);
+		this.player.play('player_run', true);
         tutorialText.setVisible(false);
-
+        
     } else if (this.cursors.up.isDown) {
-        this.player.setVelocity(0, -50);
+        this.player.setVelocityY(-speed);
+		this.player.play('player_run', true);
         tutorialText.setVisible(false);
-
-        if (this.direction == 1) {
-            this.player.anims.play('right_run', true);
-        } else if (this.direction == -1) {
-            this.player.anims.play('left_run', true);
-        }
-
+        
     } else if (this.cursors.down.isDown) {
-        this.player.setVelocity(0, 50);
+        this.player.setVelocityY(speed);
+		this.player.play('player_run', true);
         tutorialText.setVisible(false);
-
-        if (this.direction == 1) {
-            this.player.anims.play('right_run', true);
-        } else if (this.direction == -1) {
-            this.player.anims.play('left_run', true);
-        }
         
     } else {
-        if (this.direction == 1) {
-            this.player.anims.play('idle_right', true);
-        } else if (this.direction == -1) {
-            this.player.anims.play('idle_left', true)
-        }
+        this.player.setVelocity(0, 0)
+        this.player.play('player_idle', true)
     };
 };
 
 
-gameScene.makeBar = function(x,y,color){
-    //draw the bar
-    let bar = this.add.graphics();
+// gameScene.makeBar = function(x,y,color)
+//     // draw the bar
+//     let bar = this.add.graphics();
 
-    //color the bar
-    bar.fillStyle(color, 1);
+//     // color the bar
+//     bar.fillStyle(color, 1);
 
-    //fill the bar with a rectangle
-    bar.fillRect(0, 0, 200, 50);
+//     // fill the bar with a rectangle
+//     bar.fillRect(0, 0, 200, 50);
     
-    //position the bar
-    bar.x = x;
-    bar.y = y;
+//     // position the bar
+//     bar.x = x;
+//     bar.y = y;
 
-    //return the bar
-    return bar;
-};
+//     // return the bar
+//     return bar;
+// };
 
-gameScene.setValue = function(bar,percentage) {
-    //scale the bar
-    bar.scaleX = percentage/100;
-}
+// gameScene.setValue = function(bar,percentage) {
+//     //scale the bar
+//     bar.scaleX = percentage/100;
+// }
 
 const config = {
 	type: Phaser.AUTO,
@@ -187,9 +159,9 @@ const config = {
 	height: 225,
 	scene: gameScene,
 	physics: {
-		default: 'arcade',
-		arcade: {
-			debug: false
+		default: 'matter',
+		matter: {
+			debug: true
 		},
 	}
 };
