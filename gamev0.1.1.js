@@ -90,9 +90,9 @@ gameScene.create = function() {
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
 
     // make health bar
-    // let healthBar = this.makeBar(20,100,0x2ecc71);
+    let healthBar = this.makeBar(20,100,0x2ecc71);
  
-    // this.setValue(healthBar,100);
+    this.setValue(healthBar,100);
 
 }
 
@@ -130,28 +130,28 @@ gameScene.update = function() {
 };
 
 
-// gameScene.makeBar = function(x,y,color)
-//     // draw the bar
-//     let bar = this.add.graphics();
+gameScene.makeBar = function(x,y,color) {
+    // draw the bar
+    let bar = this.add.graphics();
 
-//     // color the bar
-//     bar.fillStyle(color, 1);
+    // color the bar
+    bar.fillStyle(color, 1);
 
-//     // fill the bar with a rectangle
-//     bar.fillRect(0, 0, 200, 50);
+    // fill the bar with a rectangle
+    bar.fillRect(0, 0, 200, 50);
     
-//     // position the bar
-//     bar.x = x;
-//     bar.y = y;
+    // position the bar
+    bar.x = x;
+    bar.y = y;
 
-//     // return the bar
-//     return bar;
-// };
+    // return the bar
+    return bar;
+};
 
-// gameScene.setValue = function(bar,percentage) {
-//     //scale the bar
-//     bar.scaleX = percentage/100;
-// }
+gameScene.setValue = function(bar,percentage) {
+    //scale the bar
+    bar.scaleX = percentage/100;
+}
 
 const config = {
 	type: Phaser.AUTO,
