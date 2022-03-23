@@ -97,9 +97,37 @@ gameScene.create = function() {
     const stairs = map.createLayer('Stairs', tileset, 0,0);
     const walls = map.createLayer('Walls', tileset, 0,0);
     const extra = map.createLayer('Extra', tileset, 0,0);
+
+
+    const width = this.scale.width;
+	const height = this.scale.height;
+
+    const rt = this.make.renderTexture({
+		width,
+		height
+	}, true);
+
+    rt.fill(0x000000, 1);
+
+	// draw the floorLayer into it
+	rt.draw(stoneFloor);
+
+	// set a dark blue tint
+	rt.setTint(0x0a2948);
         
     this.player = this.physics.add.sprite(100, 125, 'player');
     this.player.setScale(2);
+
+    this.vision = this.make.image({
+		x: this.player.x,
+		y: this.player.y,
+		key: 'vision',
+		add: false
+	});
+	this.vision.scale = 2.5;
+
+	rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
+	rt.mask.invertAlpha = true;
     
     this.physics.add.collider(this.player, walls);
     walls.setCollisionByProperty({ collides: true });
@@ -172,6 +200,12 @@ gameScene.update = function() {
 	this.player.setCollideWorldBounds(true);
     //this.enemy.anims.play('minotaur', true);
     this.player.anims.play('idle_right', true);
+
+    if (this.vision)
+	{
+		this.vision.x = this.player.x
+		this.vision.y = this.player.y
+	}
     
     if (this.cursors.right.isDown) {
         this.player.setVelocity(50, 0);
