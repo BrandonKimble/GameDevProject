@@ -2,12 +2,71 @@
 
 let gameScene = new Phaser.Scene('Game');
 
+class HealthBar {
+
+    constructor (gameScene, x, y)
+    {
+        this.bar = new Phaser.GameObjects.Graphics(gameScene);
+
+        this.x = x;
+        this.y = y;
+        this.value = 500;
+        this.p = 295 / 500;
+
+        this.draw();
+
+        gameScene.add.existing(this.bar);
+    }
+
+    decrease (amount)
+    {
+        this.value -= amount;
+
+        if (this.value < 0)
+        {
+            this.value = 0;
+        }
+
+        this.draw();
+
+        return (this.value === 0);
+    }
+
+    draw ()
+    {
+        this.bar.clear();
+
+        //  BG
+        this.bar.fillStyle(0x000000);
+        this.bar.fillRect(this.x, this.y, 300, 16);
+
+        //  Health
+
+        this.bar.fillStyle(0xffffff);
+        this.bar.fillRect(this.x + 2, this.y + 2, 295, 12);
+
+        if (this.value < 100)
+        {
+            this.bar.fillStyle(0xff0000);
+        }
+        else
+        {
+            this.bar.fillStyle(0x00ff00);
+        }
+
+        var d = Math.floor(this.p * this.value);
+
+        this.bar.fillRect(this.x + 2, this.y + 2, d, 12);
+    }
+
+}
 
 gameScene.init = function() {
 
     this.player;
     this.minotaur;
-    this.direction;
+    this.healthBar;
+    this.health;
 
 };
 
@@ -17,6 +76,7 @@ gameScene.preload = function() {
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
     this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
+    this.load.image('vision', 'assets/vision.png');
 
     this.load.json('characters', 'assets/characters.json')
 };
@@ -76,28 +136,67 @@ gameScene.create = function() {
     walls.setCollisionByProperty({ collides: true });
     this.matter.world.convertTilemapLayer(walls);
 
-    this.player = this.matter.add.sprite(100, 125, 'player', 'knight', {characters: characters.knight})
+    // FOV
+    const { width, height } = this.scale;
+
+    const rt = this.make.renderTexture({
+        width,
+        height
+    }, true);
+
+    rt.fill(0x000000, 1);
+    // draw the floorLayer into it
+    rt.draw(stoneFloor);
+    // set a dark blue tint
+    rt.setTint(0x0a2948);
+
+
+    this.player = this.matter.add.sprite(100, 125, 'player', 'knight_idle_anim_f1.png', { characters: characters.knight })
         .setScale(2)
         .play('player_idle')
         .setFixedRotation();
-    
-        
-    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur', 'minotaur', {characters: characters.minotaur})
+
+    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur', 'tile000.png', { characters: characters.minotaur })
         .play('minotaur_idle')
         .setFixedRotation();
     
 
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', {fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
 
-    // make health bar
-    let healthBar = this.makeBar(20,100,0x2ecc71);
- 
-    this.setValue(healthBar,100);
+
+    this.vision = this.make.image({
+        x: this.player.x,
+        y: this.player.y,
+        key: 'vision',
+        add: false
+    });
+    
+    this.vision.scale = 2.5;
+
+    rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
+    rt.mask.invertAlpha = true;
+    
+    // Health Bar
+    let healthBar = new HealthBar(gameScene, 20 , 200);
+
+    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+        if ((bodyA.label == "player" && bodyB.label == "minotaur") || (bodyB.label == "minotaur" && bodyA.label == "player")) {
+            let dead = healthBar.decrease(10);
+            if (dead) this.scene.restart();       
+        }
+    });
 
 }
 
 
 gameScene.update = function() {
+    this.enemyFollows(this.minotaur, this.player);
+
+    if (this.vision) {
+		this.vision.x = this.player.x
+		this.vision.y = this.player.y
+	}
+
 
     let speed = 3;
     
@@ -129,29 +228,14 @@ gameScene.update = function() {
     };
 };
 
+gameScene.enemyFollows = function(from, to, speed = 1) {
 
-gameScene.makeBar = function(x,y,color) {
-    // draw the bar
-    let bar = this.add.graphics();
+    const direction = Math.atan((to.x - from.x) / (to.y - from.y));
+    const speed2 = to.y >= from.y ? speed : -speed;
 
-    // color the bar
-    bar.fillStyle(color, 1);
-
-    // fill the bar with a rectangle
-    bar.fillRect(0, 0, 200, 50);
-    
-    // position the bar
-    bar.x = x;
-    bar.y = y;
-
-    // return the bar
-    return bar;
+    return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
 };
 
-gameScene.setValue = function(bar,percentage) {
-    //scale the bar
-    bar.scaleX = percentage/100;
-}
 
 const config = {
 	type: Phaser.AUTO,
