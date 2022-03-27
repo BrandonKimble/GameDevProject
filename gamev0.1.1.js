@@ -119,13 +119,12 @@ gameScene.create = function() {
         repeat: -1
     });
 
-    this.matter.world.disableGravity();
 
-    characters = this.cache.json.get("characters")
-    
+    this.matter.world.disableGravity();
     this.cursors = this.input.keyboard.createCursorKeys();
-	
-    
+
+    const characters = this.cache.json.get("characters")
+
     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
     const tileset = map.addTilesetImage('dungeon', 'tiles');
     this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
@@ -138,12 +137,16 @@ gameScene.create = function() {
     this.matter.world.convertTilemapLayer(walls);
     
     
-    this.player = this.matter.add.sprite(100, 125, 'player', 'knight_idle_anim_f1.png', { characters: characters.knight })
+    this.player = this.matter.add.sprite(100, 125, 'player')
+    .setBody(characters.knight)
     .setScale(2)
     .play('player_idle')
     .setFixedRotation();
+
+
     
-    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur', 'tile000.png', { characters: characters.minotaur })
+    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
+    .setBody(characters.minotaur)
     .play('minotaur_idle')
     .setFixedRotation();
     
@@ -172,7 +175,7 @@ gameScene.create = function() {
     
     let myScene = this.scene
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ('characters' in bodyA && 'characters' in bodyB) {
+        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
             let dead = healthBar.decrease(10);
             if (dead) { myScene.restart(); }
         }
