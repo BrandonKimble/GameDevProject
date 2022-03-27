@@ -170,12 +170,11 @@ gameScene.create = function() {
     // Health Bar
     let healthBar = new HealthBar(gameScene, 20 , 200);
     
+    let myScene = this.scene
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
         if ('characters' in bodyA && 'characters' in bodyB) {
             let dead = healthBar.decrease(10);
-            if (dead) {
-                this.scene.restart();
-            }
+            if (dead) { myScene.restart(); }
         }
     });
 
