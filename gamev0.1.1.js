@@ -166,6 +166,7 @@ gameScene.create = function() {
     }, true);
 
 
+    
     // Health Bar
     let healthBar = new HealthBar(gameScene, 20 , 200);
     
@@ -184,8 +185,6 @@ gameScene.create = function() {
 gameScene.update = function() {
     
     // FOV
-    this.enemyFollows(this.minotaur, this.player);
-
     this.rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
     this.rt.mask.invertAlpha = true;    
     
@@ -225,6 +224,10 @@ gameScene.update = function() {
         this.player.setVelocity(0, 0)
         this.player.play('player_idle', true)
     };
+
+    let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
+    this.minotaur.setVelocity(velX, velY);
+
 };
 
 gameScene.enemyFollows = function(from, to, speed = 1) {
