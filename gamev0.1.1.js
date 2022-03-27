@@ -170,12 +170,15 @@ gameScene.create = function() {
     // Health Bar
     let healthBar = new HealthBar(gameScene, 20 , 200);
     
-    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "player" && bodyB.label == "minotaur") || (bodyB.label == "minotaur" && bodyA.label == "player")) {
+    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
+        if ('characters' in bodyA && 'characters' in bodyB) {
             let dead = healthBar.decrease(10);
-            if (dead) this.scene.restart();       
+            if (dead) {
+                this.scene.restart();
+            }
         }
     });
+
     
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
     
