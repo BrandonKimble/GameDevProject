@@ -122,12 +122,13 @@ gameScene.create = function() {
     this.matter.world.disableGravity();
 
     characters = this.cache.json.get("characters")
-
+    
     this.cursors = this.input.keyboard.createCursorKeys();
 	
+    
     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
     const tileset = map.addTilesetImage('dungeon', 'tiles');
-    const stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
+    this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
     const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
     const stairs = map.createLayer('Stairs', tileset, 0,0);
     const walls = map.createLayer('Walls', tileset, 0,0);
@@ -135,35 +136,18 @@ gameScene.create = function() {
     
     walls.setCollisionByProperty({ collides: true });
     this.matter.world.convertTilemapLayer(walls);
-
-    // FOV
-    const { width, height } = this.scale;
-
-    const rt = this.make.renderTexture({
-        width,
-        height
-    }, true);
-
-    rt.fill(0x000000, 1);
-    // draw the floorLayer into it
-    rt.draw(stoneFloor);
-    // set a dark blue tint
-    rt.setTint(0x0a2948);
-
-
-    this.player = this.matter.add.sprite(100, 125, 'player', 'knight_idle_anim_f1.png', { characters: characters.knight })
-        .setScale(2)
-        .play('player_idle')
-        .setFixedRotation();
-
-    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur', 'tile000.png', { characters: characters.minotaur })
-        .play('minotaur_idle')
-        .setFixedRotation();
     
-
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
-
-
+    
+    this.player = this.matter.add.sprite(100, 125, 'player', 'knight_idle_anim_f1.png', { characters: characters.knight })
+    .setScale(2)
+    .play('player_idle')
+    .setFixedRotation();
+    
+    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur', 'tile000.png', { characters: characters.minotaur })
+    .play('minotaur_idle')
+    .setFixedRotation();
+    
+    // FOV
     this.vision = this.make.image({
         x: this.player.x,
         y: this.player.y,
@@ -171,32 +155,47 @@ gameScene.create = function() {
         add: false
     });
     
-    this.vision.scale = 2.5;
-
-    rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
-    rt.mask.invertAlpha = true;
+    this.vision.scale = 2;
     
+    const width = this.scale.width
+    const height = this.scale.height
+    
+    this.rt = this.make.renderTexture({
+        width,
+        height
+    }, true);
+
+
     // Health Bar
     let healthBar = new HealthBar(gameScene, 20 , 200);
-
+    
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
         if ((bodyA.label == "player" && bodyB.label == "minotaur") || (bodyB.label == "minotaur" && bodyA.label == "player")) {
             let dead = healthBar.decrease(10);
             if (dead) this.scene.restart();       
         }
     });
-
+    
+    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
+    
 }
 
 
 gameScene.update = function() {
+    
+    // FOV
     this.enemyFollows(this.minotaur, this.player);
 
-    if (this.vision) {
-		this.vision.x = this.player.x
-		this.vision.y = this.player.y
-	}
+    this.rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
+    this.rt.mask.invertAlpha = true;    
+    
+    this.rt.fill(0x000000, 1);
+    this.rt.draw(this.stoneFloor);
+    this.rt.setTint(0x0a2948);
 
+    this.vision.x = this.player.x
+    this.vision.y = this.player.y
+    
 
     let speed = 3;
     
