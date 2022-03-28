@@ -74,6 +74,7 @@ gameScene.preload = function() {
 
     this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
+    this.load.image('gameOver','assets/gameOverText.png');
     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
     this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
     this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
@@ -185,11 +186,19 @@ gameScene.create = function() {
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
         if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
             let dead = healthBar.decrease(10);
-            if (dead) { myScene.restart(); }
+            // end game
+            if (dead) { 
+                myScene.pause();
+                gameOver.visible = true;
+
+             }
         }
     });
 
-    
+    gameOver = this.add.image(700,150,'gameOver');
+    gameOver.setScale(0.1);
+    gameOver.setOrigin(0.5);
+    gameOver.visible = false;
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
 
 }
