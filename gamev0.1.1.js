@@ -75,6 +75,7 @@ gameScene.preload = function() {
     this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
+    this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
     this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
     this.load.image('vision', 'assets/vision.png');
 
@@ -119,6 +120,15 @@ gameScene.create = function() {
         repeat: -1
     });
 
+    this.anims.create({
+        key: 'player_attack',
+        frameRate: 3,
+        frames: this.anims.generateFrameNames('attack', {
+            frames: [0,1,2 ]}),
+        frameRate: 3,
+        repeat: 0
+    });
+ 
 
     this.matter.world.disableGravity();
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -231,6 +241,12 @@ gameScene.update = function() {
         this.player.play('player_idle', true)
 
     };
+
+
+    if (this.cursors.space.isDown)
+    {
+        this.player.play('player_attack',true);		
+    }
 
     let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
     this.minotaur.setVelocity(velX, velY);
