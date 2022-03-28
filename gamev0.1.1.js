@@ -1,6 +1,67 @@
-
-
 let gameScene = new Phaser.Scene('Game');
+
+
+class HealthBar {
+
+    constructor (gameScene, x, y)
+    {
+        this.bar = new Phaser.GameObjects.Graphics(gameScene);
+
+        this.x = x;
+        this.y = y;
+        this.value = 500;
+        this.p = 295 / 500;
+
+        this.draw();
+
+        gameScene.add.existing(this.bar);
+    }
+
+    decrease (amount)
+    {
+        this.value -= amount;
+
+        if (this.value < 0)
+        {
+            this.value = 0;
+        }
+
+        this.draw();
+
+        return (this.value === 0);
+    }
+
+    draw ()
+    {
+        this.bar.clear();
+
+        //  BG
+        this.bar.fillStyle(0x000000);
+        this.bar.fillRect(this.x, this.y, 300, 16);
+
+        //  Health
+
+        this.bar.fillStyle(0xffffff);
+        this.bar.fillRect(this.x + 2, this.y + 2, 295, 12);
+
+        if (this.value < 100)
+        {
+            this.bar.fillStyle(0xff0000);
+        }
+        else
+        {
+            this.bar.fillStyle(0x00ff00);
+        }
+
+        var d = Math.floor(this.p * this.value);
+
+        this.bar.fillRect(this.x + 2, this.y + 2, d, 12);
+    }
+
+}
+
+
+
 
 class HealthBar {
 
@@ -65,6 +126,8 @@ gameScene.init = function() {
 
     this.player;
     this.minotaur;
+    this.enemy;
+    this.direction;
     this.healthBar;
     this.health;
 
@@ -132,7 +195,7 @@ gameScene.create = function() {
     const stairs = map.createLayer('Stairs', tileset, 0,0);
     const walls = map.createLayer('Walls', tileset, 0,0);
     const extra = map.createLayer('Extra', tileset, 0,0);
-    
+
     walls.setCollisionByProperty({ collides: true });
     this.matter.world.convertTilemapLayer(walls);
     
@@ -142,9 +205,7 @@ gameScene.create = function() {
     .setScale(2)
     .play('player_idle')
     .setFixedRotation();
-
-
-    
+  
     this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
     .setBody(characters.minotaur)
     .play('minotaur_idle')
@@ -183,12 +244,13 @@ gameScene.create = function() {
 
     
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
-    
+
 }
 
 
 gameScene.update = function() {
     
+
     // FOV
     this.rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
     this.rt.mask.invertAlpha = true;    
@@ -202,6 +264,7 @@ gameScene.update = function() {
     
 
     let speed = 3;
+
     
     if (this.cursors.right.isDown) {
         this.player.flipX = false
@@ -226,8 +289,10 @@ gameScene.update = function() {
         tutorialText.setVisible(false);
         
     } else {
+
         this.player.setVelocity(0, 0)
         this.player.play('player_idle', true)
+
     };
 
     let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
