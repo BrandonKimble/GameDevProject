@@ -199,8 +199,9 @@ gameScene.create = function() {
     gameOver.setScale(0.1);
     gameOver.setOrigin(0.5);
     gameOver.visible = false;
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around', { fontSize: '32px', fill: '#FFFFFF' });
-
+    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText2.visible = false;
 }
 
 
@@ -227,22 +228,26 @@ gameScene.update = function() {
         this.player.setVelocityX(speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
+        tutorialText2.visible = true;
 
     } else if (this.cursors.left.isDown) {
         this.player.flipX = true
         this.player.setVelocityX(-speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
+        tutorialText2.visible = true;
         
     } else if (this.cursors.up.isDown) {
         this.player.setVelocityY(-speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
+        tutorialText2.visible = true;
         
     } else if (this.cursors.down.isDown) {
         this.player.setVelocityY(speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
+        tutorialText2.visible = true;
         
     } else {
 
@@ -254,7 +259,12 @@ gameScene.update = function() {
 
     if (this.cursors.space.isDown)
     {
-        this.player.play('player_attack',true);		
+        this.player.play('player_attack',true);
+        // remove tutorial text after first attack
+        tutorialText2.visible = false;
+        tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
+
+
     }
 
     let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
@@ -272,7 +282,7 @@ gameScene.enemyFollows = function(from, to, speed = 1) {
 
 
 const config = {
-	type: Phaser.AUTO,
+	type: Phaser.WEBGL,
 	width: 1650,
 	height: 225,
 	scene: gameScene,
