@@ -285,8 +285,11 @@ gameScene.enemyFollows = function(from, to, speed = 1) {
 
 const config = {
 	type: Phaser.WEBGL,
-	width: 1650,
-	height: 500,
+	width: 1600,
+	height: 1600,
+    scale: {
+        mode: Phaser.Scale.FIT,
+    },
 	scene: gameScene,
 	physics: {
 		default: 'matter',
