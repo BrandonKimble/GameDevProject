@@ -72,7 +72,7 @@ gameScene.init = function() {
 
 gameScene.preload = function() {
 
-    this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
+    this.load.tilemapTiledJSON('map', 'assets/level_one.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.image('gameOver','assets/gameOverText.png');
     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
@@ -167,7 +167,7 @@ gameScene.create = function() {
         add: false
     });
     
-    this.vision.scale = 2;
+    this.vision.scale = 1;
     
     const width = this.scale.width
     const height = this.scale.height
@@ -202,6 +202,8 @@ gameScene.create = function() {
     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
     tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
     tutorialText2.visible = false;
+
+    this.cameras.main.startFollow(this.player);
 }
 
 
@@ -284,7 +286,7 @@ gameScene.enemyFollows = function(from, to, speed = 1) {
 const config = {
 	type: Phaser.WEBGL,
 	width: 1650,
-	height: 225,
+	height: 500,
 	scene: gameScene,
 	physics: {
 		default: 'matter',
