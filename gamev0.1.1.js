@@ -183,7 +183,7 @@ gameScene.create = function() {
 
     
     // Health Bar
-    let healthBar = new HealthBar(gameScene, 300 , 500);
+    let healthBar = new HealthBar(gameScene, 200 , 400);
     
     let myScene = this.scene
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
@@ -201,9 +201,11 @@ gameScene.create = function() {
     gameOver.setScale(0.1);
     gameOver.setOrigin(0.5);
     gameOver.visible = false;
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
-    tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText = this.add.text(game.config.width/2 -475,game.config.height/2 -250, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText2 = this.add.text(game.config.width/2 -475,game.config.height/2 -250, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
     tutorialText2.visible = false;
+    tutorialText.setScrollFactor(0,0);
+    tutorialText2.setScrollFactor(0,0);
 
     this.cameras.main.startFollow(this.player);
 
@@ -281,7 +283,7 @@ gameScene.update = function() {
 
 };
 
-gameScene.enemyFollows = function(from, to, speed = 1) {
+gameScene.enemyFollows = function(from, to, speed = .5) {
 
     const direction = Math.atan((to.x - from.x) / (to.y - from.y));
     const speed2 = to.y >= from.y ? speed : -speed;
@@ -292,157 +294,157 @@ gameScene.enemyFollows = function(from, to, speed = 1) {
 
 
 
-gameScene2.init = function() {
+// gameScene2.init = function() {
 
-    this.player;
-    this.minotaur;
-    this.enemy;
-    this.direction;
-    this.healthBar;
-    this.health;
+//     this.player;
+//     this.minotaur;
+//     this.enemy;
+//     this.direction;
+//     this.healthBar;
+//     this.health;
 
-};
+// };
 
-gameScene2.preload = function() {
+// gameScene2.preload = function() {
 
-    this.load.tilemapTiledJSON('map', 'assets/level_two.json');
-    this.load.image('tiles', 'assets/Dungeon_Tileset.png');
-    this.load.image('gameOver','assets/gameOverText.png');
-    this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
-    this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
-    this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
-    this.load.image('vision', 'assets/vision.png');
+//     this.load.tilemapTiledJSON('map', 'assets/level_two.json');
+//     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
+//     this.load.image('gameOver','assets/gameOverText.png');
+//     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
+//     this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
+//     this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
+//     this.load.image('vision', 'assets/vision.png');
 
-    this.load.json('characters', 'assets/characters.json')
-};
+//     this.load.json('characters', 'assets/characters.json')
+// };
 
-gameScene2.create = function() {
+// gameScene2.create = function() {
     
-    this.anims.create({
-        key: 'player_idle',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('player', { 
-            start: 1, 
-            end: 5, 
-            prefix: 'knight_idle_anim_f',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
+//     this.anims.create({
+//         key: 'player_idle',
+//         frameRate: 10,
+//         frames: this.anims.generateFrameNames('player', { 
+//             start: 1, 
+//             end: 5, 
+//             prefix: 'knight_idle_anim_f',
+//             suffix: '.png'
+//         }),
+//         repeat: -1
+//     });
 
-    this.anims.create({
-        key: 'minotaur_idle',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('minotaur', { 
-            start: 0, 
-            end: 4, 
-            prefix: 'tile00',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
+//     this.anims.create({
+//         key: 'minotaur_idle',
+//         frameRate: 10,
+//         frames: this.anims.generateFrameNames('minotaur', { 
+//             start: 0, 
+//             end: 4, 
+//             prefix: 'tile00',
+//             suffix: '.png'
+//         }),
+//         repeat: -1
+//     });
     
-    this.anims.create({
-        key: 'player_run',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('player', {
-            start: 0,
-            end: 5,
-            prefix: 'knight_run_anim_f',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
+//     this.anims.create({
+//         key: 'player_run',
+//         frameRate: 10,
+//         frames: this.anims.generateFrameNames('player', {
+//             start: 0,
+//             end: 5,
+//             prefix: 'knight_run_anim_f',
+//             suffix: '.png'
+//         }),
+//         repeat: -1
+//     });
 
-    this.anims.create({
-        key: 'player_attack',
-        frameRate: 3,
-        frames: this.anims.generateFrameNames('attack', {
-            frames: [0,1,2 ]}),
-        frameRate: 3,
-        repeat: 0
-    });
+//     this.anims.create({
+//         key: 'player_attack',
+//         frameRate: 3,
+//         frames: this.anims.generateFrameNames('attack', {
+//             frames: [0,1,2 ]}),
+//         frameRate: 3,
+//         repeat: 0
+//     });
  
 
-    this.matter.world.disableGravity();
-    this.cursors = this.input.keyboard.createCursorKeys();
+//     this.matter.world.disableGravity();
+//     this.cursors = this.input.keyboard.createCursorKeys();
 
-    const characters = this.cache.json.get("characters")
+//     const characters = this.cache.json.get("characters")
 
-    const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
-    const tileset = map.addTilesetImage('dungeon', 'tiles');
-    this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
-    const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
-    const stairs = map.createLayer('Stairs', tileset, 0,0);
-    const walls = map.createLayer('Walls', tileset, 0,0);
-    const extra = map.createLayer('Extra', tileset, 0,0);
+//     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
+//     const tileset = map.addTilesetImage('dungeon', 'tiles');
+//     this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
+//     const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
+//     const stairs = map.createLayer('Stairs', tileset, 0,0);
+//     const walls = map.createLayer('Walls', tileset, 0,0);
+//     const extra = map.createLayer('Extra', tileset, 0,0);
 
-    walls.setCollisionByProperty({ collides: true });
-    this.matter.world.convertTilemapLayer(walls);
+//     walls.setCollisionByProperty({ collides: true });
+//     this.matter.world.convertTilemapLayer(walls);
     
     
-    this.player = this.matter.add.sprite(100, 125, 'player')
-    .setBody(characters.knight)
-    .setScale(2)
-    .play('player_idle')
-    .setFixedRotation();
+//     this.player = this.matter.add.sprite(100, 125, 'player')
+//     .setBody(characters.knight)
+//     .setScale(2)
+//     .play('player_idle')
+//     .setFixedRotation();
   
-    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
-    .setBody(characters.minotaur)
-    .play('minotaur_idle')
-    .setFixedRotation();
+//     this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
+//     .setBody(characters.minotaur)
+//     .play('minotaur_idle')
+//     .setFixedRotation();
     
-    // FOV
-    // this.vision = this.make.image({
-    //     x: this.player.x,
-    //     y: this.player.y,
-    //     key: 'vision',
-    //     add: false
-    // });
+//     FOV
+//     this.vision = this.make.image({
+//         x: this.player.x,
+//         y: this.player.y,
+//         key: 'vision',
+//         add: false
+//     });
     
-    // this.vision.scale = 1;
+//     this.vision.scale = 1;
     
-    // const width = this.scale.width
-    // const height = this.scale.height
+//     const width = this.scale.width
+//     const height = this.scale.height
     
-    // this.rt = this.make.renderTexture({
-    //     width,
-    //     height
-    // }, true);
+//     this.rt = this.make.renderTexture({
+//         width,
+//         height
+//     }, true);
 
 
     
-    // Health Bar
-    // let healthBar = new HealthBar(gameScene, 20 , 200);
+//     // Health Bar
+//     let healthBar = new HealthBar(gameScene, 20 , 200);
     
-    let myScene = this.scene
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
-            let dead = healthBar.decrease(10);
-            // end game
-            if (dead) { 
-                myScene.pause();
-                gameOver.visible = true;
+//     let myScene = this.scene
+//     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
+//         if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
+//             let dead = healthBar.decrease(10);
+//             // end game
+//             if (dead) { 
+//                 myScene.pause();
+//                 gameOver.visible = true;
 
-             }
-        }
-    });
+//              }
+//         }
+//     });
 
-    gameOver = this.add.image(700,150,'gameOver');
-    gameOver.setScale(0.1);
-    gameOver.setOrigin(0.5);
-    gameOver.visible = false;
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
-    tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
-    tutorialText2.visible = false;
+//     gameOver = this.add.image(700,150,'gameOver');
+//     gameOver.setScale(0.1);
+//     gameOver.setOrigin(0.5);
+//     gameOver.visible = false;
+//     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
+//     tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
+//     tutorialText2.visible = false;
 
-    this.cameras.main.startFollow(this.player);
+//     this.cameras.main.startFollow(this.player);
 
-    if (this.cursors.space.isDown)
-    {
-        console.log('hello');
-    }
-}
+//     if (this.cursors.space.isDown)
+//     {
+//         console.log('hello');
+//     }
+// }
 
 const config = {
 	type: Phaser.WEBGL,
@@ -450,13 +452,14 @@ const config = {
 	height: 1350,
     scale: {
         // Fit to window
-        mode: Phaser.Scale.FIT,
-        // mode: Phaser.Scale.ENVELOP,
+        // mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.ENVELOP,
         // mode: Phaser.Scale.RESIZE,
         // Center vertically and horizontally
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
 	scene: gameScene,
+    // scene: [gameScene, gameScene2],
 	physics: {
 		default: 'matter',
 		matter: {
