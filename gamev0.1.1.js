@@ -57,6 +57,8 @@ class HealthBar {
         var d = Math.floor(this.p * this.value);
 
         this.bar.fillRect(this.x + 2, this.y + 2, d, 12);
+
+        this.bar.setScrollFactor(0,0);
     }
 
 }
@@ -86,7 +88,7 @@ gameScene.preload = function() {
 };
 
 gameScene.create = function() {
-    
+
     this.anims.create({
         key: 'player_idle',
         frameRate: 10,
@@ -205,6 +207,11 @@ gameScene.create = function() {
     tutorialText2.visible = false;
 
     this.cameras.main.startFollow(this.player);
+
+    console.log('fasd')
+    if (this.attack == 'yes'){
+        console.log('attack')
+    }
 }
 
 
@@ -266,7 +273,7 @@ gameScene.update = function() {
         // remove tutorial text after first attack
         tutorialText2.visible = false;
         tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
-
+        let attack = 'yes';
 
     }
 
@@ -431,6 +438,11 @@ gameScene2.create = function() {
     tutorialText2.visible = false;
 
     this.cameras.main.startFollow(this.player);
+
+    if (this.cursors.space.isDown)
+    {
+        console.log('hello');
+    }
 }
 
 
@@ -492,7 +504,6 @@ gameScene2.update = function() {
         // remove tutorial text after first attack
         tutorialText2.visible = false;
         tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
-
 
     }
 
