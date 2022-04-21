@@ -72,7 +72,7 @@ gameScene.init = function() {
 
 gameScene.preload = function() {
 
-    this.load.tilemapTiledJSON('map', 'assets/level_one.json');
+    this.load.tilemapTiledJSON('map', 'assets/level_two.json');
     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
     this.load.image('gameOver','assets/gameOverText.png');
     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
