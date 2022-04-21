@@ -16,6 +16,7 @@ class SceneA extends Phaser.Scene{
     preload(){
 
         this.load.tilemapTiledJSON('map', 'assets/tutorial_map.json');
+        this.load.tilemapTiledJSON('map', 'assets/level_three.json');
         this.load.image('tiles', 'assets/Dungeon_Tileset.png');
         this.load.image('gameOver','assets/gameOverText.png');
         this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
@@ -289,11 +290,109 @@ class SceneB extends Phaser.Scene{
         this.x;
     }
     preload(){
+        this.load.tilemapTiledJSON('map', 'assets/level_three.json');
         this.load.image('gameOver','assets/gameOverText_1.png');
     }
 
     create(){
-        this.add.image(700,150,'gameOver');
+        this.anims.create({
+            key: 'player_idle',
+            frameRate: 10,
+            frames: this.anims.generateFrameNames('player', { 
+                start: 1, 
+                end: 5, 
+                prefix: 'knight_idle_anim_f',
+                suffix: '.png'
+            }),
+            repeat: -1
+        });
+    
+        this.anims.create({
+            key: 'minotaur_idle',
+            frameRate: 10,
+            frames: this.anims.generateFrameNames('minotaur', { 
+                start: 0, 
+                end: 4, 
+                prefix: 'tile00',
+                suffix: '.png'
+            }),
+            repeat: -1
+        });
+        
+        this.anims.create({
+            key: 'player_run',
+            frameRate: 10,
+            frames: this.anims.generateFrameNames('player', {
+                start: 0,
+                end: 5,
+                prefix: 'knight_run_anim_f',
+                suffix: '.png'
+            }),
+            repeat: -1
+        });
+    
+        this.anims.create({
+            key: 'player_attack',
+            frameRate: 3,
+            frames: this.anims.generateFrameNames('attack', {
+                frames: [0,1,2 ]}),
+            frameRate: 3,
+            repeat: 0
+        });
+     
+    
+        this.matter.world.disableGravity();
+        this.cursors = this.input.keyboard.createCursorKeys();
+    
+        const characters = this.cache.json.get("characters")
+    
+        const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
+        const tileset = map.addTilesetImage('dungeon', 'tiles');
+        this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
+        const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
+        const stairs = map.createLayer('Stairs', tileset, 0,0);
+        const walls = map.createLayer('Walls', tileset, 0,0);
+        const extra = map.createLayer('Extra', tileset, 0,0);
+    
+        walls.setCollisionByProperty({ collides: true });
+        this.matter.world.convertTilemapLayer(walls);
+        
+        
+        this.player = this.matter.add.sprite(100, 125, 'player')
+        .setBody(characters.knight)
+        .setScale(2)
+        .play('player_idle')
+        .setFixedRotation();
+      
+        this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
+        .setBody(characters.minotaur)
+        .play('minotaur_idle')
+        .setFixedRotation();
+        
+        // FOV
+        this.vision = this.make.image({
+            x: this.player.x,
+            y: this.player.y,
+            key: 'vision',
+            add: false
+        });
+        
+        this.vision.scale = 2;
+        
+        const width = this.scale.width
+        const height = this.scale.height
+        
+        this.rt = this.make.renderTexture({
+            width,
+            height
+        }, true);
+    
+    
+        
+        // Health Bar
+        // let healthBar = new HealthBar(SceneA, 20 , 200);
+        
+
 
     }
 }
