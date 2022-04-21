@@ -201,8 +201,8 @@ gameScene.create = function() {
     gameOver.setScale(0.1);
     gameOver.setOrigin(0.5);
     gameOver.visible = false;
-    tutorialText = this.add.text(game.config.width/2 -475,game.config.height/2 -250, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
-    tutorialText2 = this.add.text(game.config.width/2 -475,game.config.height/2 -250, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText = this.add.text(game.config.width/2 -600,game.config.height/2 -250, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
+    tutorialText2 = this.add.text(game.config.width/2 -600,game.config.height/2 -250, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
     tutorialText2.visible = false;
     tutorialText.setScrollFactor(0,0);
     tutorialText2.setScrollFactor(0,0);
@@ -448,7 +448,7 @@ gameScene.enemyFollows = function(from, to, speed = .5) {
 
 const config = {
 	type: Phaser.WEBGL,
-	width: 1350,
+	width: 1600,
 	height: 1350,
     scale: {
         // Fit to window
