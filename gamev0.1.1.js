@@ -65,17 +65,21 @@ class HealthBar {
 }
 
 
-// game scene 1 
+
+// game scene 1
 gameScene.init = function() {
 
     this.player;
     this.minotaur;
+    this.goblin;
+    this.goblin2;
     this.enemy;
     this.direction;
     this.healthBar;
     this.health;
     this.exit;
 
+    const Enemies = [this.goblin, this.goblin2, this.minotaur];
 };
 
 gameScene.preload = function() {
@@ -87,38 +91,32 @@ gameScene.preload = function() {
     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
     this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
     this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
+    this.load.atlas('goblin_anim', 'assets/goblin_anim.png', 'assets/goblin_anim.json');
+    this.load.atlas('goblin_run', 'assets/goblin_run.png', 'assets/goblin_run.json');
+    this.load.atlas('slime', 'assets/slime.png', 'assets/slime.json');
     this.load.image('vision', 'assets/vision.png');
 
     this.load.json('characters', 'assets/characters.json');
+    this.load.json('Goblin', 'assets/goblin.json');
+    this.load.json('Slime', 'assets/slime_box.json');
     this.load.json('objects', 'assets/objects.json');
 };
 
 gameScene.create = function() {
 
+    // player anims
     this.anims.create({
         key: 'player_idle',
         frameRate: 10,
-        frames: this.anims.generateFrameNames('player', { 
-            start: 1, 
-            end: 5, 
+        frames: this.anims.generateFrameNames('player', {
+            start: 1,
+            end: 5,
             prefix: 'knight_idle_anim_f',
             suffix: '.png'
         }),
         repeat: -1
     });
-
-    this.anims.create({
-        key: 'minotaur_idle',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('minotaur', { 
-            start: 0, 
-            end: 4, 
-            prefix: 'tile00',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
-    
+    //player run
     this.anims.create({
         key: 'player_run',
         frameRate: 10,
@@ -130,7 +128,7 @@ gameScene.create = function() {
         }),
         repeat: -1
     });
-
+    //player attack
     this.anims.create({
         key: 'player_attack',
         frameRate: 3,
@@ -139,47 +137,144 @@ gameScene.create = function() {
         frameRate: 3,
         repeat: 0
     });
- 
+
+    //goblin anims
+    this.anims.create({
+        key: 'minotaur_idle',
+        frameRate: 10,
+        frames: this.anims.generateFrameNames('minotaur', {
+            start: 0,
+            end: 4,
+            prefix: 'tile00',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });    
+
+    //goblin anims
+    this.anims.create({
+        key: 'goblin_idle',
+        frameRate: 6,
+        frames: this.anims.generateFrameNames('goblin_anim', {
+            start: 0,
+            end: 5,
+            prefix: 'goblin_idle_anim_f',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });
+    this.anims.create({
+        key: 'goblin_runs',
+        frameRate: 6,
+        frames: this.anims.generateFrameNames('goblin_run', {
+            start: 0,
+            end: 5,
+            prefix: 'goblin_run_anim_f',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });
+
+    //slime_anims
+    this.anims.create({
+        key: 'slime_anim',
+        frameRate: 6,
+        frames: this.anims.generateFrameNames('slime', {
+            start: 0,
+            end: 5,
+            prefix: 'slime_run_anim_f',
+            suffix: '.png'
+        }),
+        repeat: -1
+    });
+
+
+
+
+
 
     this.matter.world.disableGravity();
     this.cursors = this.input.keyboard.createCursorKeys();
 
     const characters = this.cache.json.get("characters")
 
+    const Goblin = this.cache.json.get("Goblin")
+    const Slime = this.cache.json.get("Slime")
+
     const objects = this.cache.json.get("objects")
 
     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
     const tileset = map.addTilesetImage('dungeon', 'tiles');
     this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
-    this.exit = map.createLayer('Exit', tileset, 0,0);
-    const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
-    const stairs = map.createLayer('Stairs', tileset, 0,0);
+     // this.exit = map.createLayer('Exit', tileset, 0,0); 
+    // const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
+    // const stairs = map.createLayer('Stairs', tileset, 0,0);
     const walls = map.createLayer('Walls', tileset, 0,0);
-    const extra = map.createLayer('Extra', tileset, 0,0);
+    // const extra = map.createLayer('Extra', tileset, 0,0);
 
     walls.setCollisionByProperty({ collides: true });
-    this.exit.setCollisionByProperty({ collides: true });
+    // this.exit.setCollisionByProperty({ collides: true });
     this.matter.world.convertTilemapLayer(walls);
-    
-    
+
+    //add player
     this.player = this.matter.add.sprite(100, 125, 'player')
     .setBody(characters.knight)
     .setScale(2)
     .play('player_idle')
     .setFixedRotation();
-  
+
+    // add enemies
     this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
     .setBody(characters.minotaur)
+    // .setScale(1.5)
     .play('minotaur_idle')
+    .setFixedRotation();
+
+    this.goblin = this.matter.add.sprite(800, 900, 'goblin_anim')
+    .setBody(Goblin.goblin)
+    .setScale(2)
+    .play('goblin_idle')
+    .setFixedRotation();
+
+    this.goblin2 = this.matter.add.sprite(900, 900, 'goblin_anim')
+    .setBody(Goblin.goblin)
+    .setScale(2)
+    .play('goblin_idle')
+    .setFixedRotation();
+
+
+    
+    this.slime1 = this.matter.add.sprite(300, 700, 'slime_anim')
+    .setBody(Slime.slime)
+    .setScale(2)
+    .play('slime_anim')
     .setFixedRotation();
 
     //add ladder to the scene
 
-    this.ladder = this.matter.add.sprite(800, 900, 'ladder')
-    .setBody(objects.ladder)
-    .setScale(1.5)
-    .setFixedRotation();
-    
+    // this.ladder = this.matter.add.sprite(800, 900, 'ladder')
+    // .setBody(objects.ladder)
+    // .setScale(1.5)
+    // .setFixedRotation();
+    // Health Bar
+    let healthBar = new HealthBar(gameScene, 200 , 400);
+
+    let myScene = this.scene
+
+    console.log('hello')
+
+    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {   
+            console.log('damage', healthBar)
+            let dead = healthBar.decrease(10);
+            // end game
+            if (dead) {
+                myScene.pause();
+                gameOver.visible = true;
+             } 
+        }
+    });
+    console.log('bye')
     // // FOV
     this.vision = this.make.image({
         x: this.player.x,
@@ -187,48 +282,44 @@ gameScene.create = function() {
         key: 'vision',
         add: false
     });
-    
+
     this.vision.scale = .75;
-    
+
     const width = this.scale.width;
     const height =  1600;
-    
+
     this.rt = this.make.renderTexture({
         width,
         height
     }, true);
 
+
+
     
-    // Health Bar
-    let healthBar = new HealthBar(gameScene, 200 , 400);
-    
-    let myScene = this.scene
-
-    if ( 774 < this.player.x && this.player.x < 870 && 863 < this.player.y && this.player.y < 990 ){
-        console.log('hello');
-        console.log('x', this.player.x, 'y',this.player.y);
-        myScene.start(gameScene2);
-    }
-
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "ladder") || (bodyB.label == "knight" && bodyA.label == "ladder")) {
-            console.log('hello');
-            // myScene.start(gameScene2);
-        }
-    });
-
-
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
+        if ((bodyA.label == "knight" && bodyB.label == "goblin") || (bodyB.label == "knight" && bodyA.label == "goblin")) {
             console.log('damage')
             let dead = healthBar.decrease(10);
             // end game
-            if (dead) { 
-                // myScene.restart();
+            if (dead) {
+                 myScene.pause();
                 gameOver.visible = true;
              }
         }
     });
+
+    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
+        if ((bodyA.label == "knight" && bodyB.label == "slime") || (bodyB.label == "knight" && bodyA.label == "slime")) {
+            console.log('damage')
+            let dead = healthBar.decrease(10);
+            // end game
+            if (dead) {
+                 myScene.pause();
+                gameOver.visible = true;
+             }
+        }
+    });
+    
 
     gameOver = this.add.image(700,150,'gameOver');
     gameOver.setScale(0.1);
@@ -248,21 +339,21 @@ gameScene.update = function() {
     // console.log('x', this.player.x, 'y',this.player.y);
 
     let myScene = this.scene
-
-    if ( 774 < this.player.x && this.player.x < 870 && 863 < this.player.y && this.player.y < 990 ){
-        console.log('hello');
-        console.log('x', this.player.x, 'y',this.player.y);
-        myScene.restart();
-        myScene.start(gameScene2);
-    }
+    //go to next level
+    // if ( 774 < this.player.x && this.player.x < 870 && 863 < this.player.y && this.player.y < 990 ){
+    //     console.log('hello');
+    //     console.log('x', this.player.x, 'y',this.player.y);
+    //     myScene.restart();
+    //     myScene.start(gameScene2);
+    // }
 
     this.vision.x = this.player.x
     this.vision.y = this.player.y
-    
+
 
     let speed = 3;
 
-    
+
     if (this.cursors.right.isDown) {
         this.player.flipX = false
         this.player.setVelocityX(speed);
@@ -270,25 +361,26 @@ gameScene.update = function() {
         tutorialText.setVisible(false);
         tutorialText2.visible = true;
 
-    } else if (this.cursors.left.isDown) {
+    } 
+    else if (this.cursors.left.isDown) {
         this.player.flipX = true
         this.player.setVelocityX(-speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
         tutorialText2.visible = true;
-        
+
     } else if (this.cursors.up.isDown) {
         this.player.setVelocityY(-speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
         tutorialText2.visible = true;
-        
+
     } else if (this.cursors.down.isDown) {
         this.player.setVelocityY(speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
         tutorialText2.visible = true;
-        
+
     } else {
 
         this.player.setVelocity(0, 0)
@@ -305,249 +397,268 @@ gameScene.update = function() {
         tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
 
     }
+    // go through array of enemies of set their velocity
 
-    let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
-    this.minotaur.setVelocity(velX, velY);
 
+    if (this.player.anims.getName()  == 'player_attack') {
+        console.log('Player is attacking')
+      
+    }
+
+    let healthBar = new HealthBar(gameScene, 200 , 400);
+
+
+
+
+
+    const Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+
+    for (elements of Enemies){
+        // make velocity an array and assign array values to enemy x and y velocity
+        velocity = this.enemyFollows(elements, this.player);
+        elements.setVelocity(velocity[0], velocity[1]);
+    }
 };
 
 gameScene.enemyFollows = function(from, to, speed = .5) {
 
     const direction = Math.atan((to.x - from.x) / (to.y - from.y));
+    // console.log(direction, 'dir')
     const speed2 = to.y >= from.y ? speed : -speed;
-
-    return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
+    //return velocity as an array and then assign each value to x and y
+    return [speed2 * Math.sin(direction), speed2 * Math.cos(direction),direction]
+    // return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
 };
 
 
 
 //scene 2
 
-gameScene2.init = function() {
+// gameScene2.init = function() {
 
-    this.player;
-    this.minotaur;
-    this.enemy;
-    this.direction;
-    this.healthBar;
-    this.health;
+//     this.player;
+//     this.minotaur;
+//     this.enemy;
+//     this.direction;
+//     this.healthBar;
+//     this.health;
 
-};
+// };
 
-gameScene2.preload = function() {
+// gameScene2.preload = function() {
 
-    this.load.tilemapTiledJSON('map', 'assets/level_two.json');
-    this.load.image('tiles', 'assets/Dungeon_Tileset.png');
-    this.load.image('gameOver','assets/gameOverText.png');
-    this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
-    this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
-    this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
-    this.load.image('vision', 'assets/vision.png');
+//     this.load.tilemapTiledJSON('map', 'assets/level_two.json');
+//     this.load.image('tiles', 'assets/Dungeon_Tileset.png');
+//     this.load.image('gameOver','assets/gameOverText.png');
+//     this.load.atlas('player', 'assets/knight.png', 'assets/knight.json');
+//     this.load.spritesheet('attack','assets/knight/knight_attack_spritesheet2.png', {frameWidth: 24, frameHeight: 16})
+//     this.load.atlas('minotaur', 'assets/minotaur.png', 'assets/minotaur.json');
+//     this.load.image('vision', 'assets/vision.png');
 
-    this.load.json('characters', 'assets/characters.json')
-};
+//     this.load.json('characters', 'assets/characters.json')
+// };
 
-gameScene2.create = function() {
-    
-    this.anims.create({
-        key: 'player_idle',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('player', { 
-            start: 1, 
-            end: 5, 
-            prefix: 'knight_idle_anim_f',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
+// gameScene2.create = function() {
 
-    this.anims.create({
-        key: 'minotaur_idle',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('minotaur', { 
-            start: 0, 
-            end: 4, 
-            prefix: 'tile00',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
-    
-    this.anims.create({
-        key: 'player_run',
-        frameRate: 10,
-        frames: this.anims.generateFrameNames('player', {
-            start: 0,
-            end: 5,
-            prefix: 'knight_run_anim_f',
-            suffix: '.png'
-        }),
-        repeat: -1
-    });
+//     this.anims.create({
+//         key: 'player_idle',
+//         frameRate: 10,
+//         frames: this.anims.generateFrameNames('player', {
+//             start: 1,
+//             end: 5,
+//             prefix: 'knight_idle_anim_f',
+//             suffix: '.png'
+//         }),
+//         repeat: -1
+//     });
 
-    this.anims.create({
-        key: 'player_attack',
-        frameRate: 3,
-        frames: this.anims.generateFrameNames('attack', {
-            frames: [0,1,2 ]}),
-        frameRate: 3,
-        repeat: 0
-    });
- 
+//     this.anims.create({
+//         key: 'minotaur_idle',
+//         frameRate: 10,
+//         frames: this.anims.generateFrameNames('minotaur', {
+//             start: 0,
+//             end: 4,
+//             prefix: 'tile00',
+//             suffix: '.png'
+//         }),
+//         repeat: -1
+//     });
 
-    this.matter.world.disableGravity();
-    this.cursors = this.input.keyboard.createCursorKeys();
+//     this.anims.create({
+//         key: 'player_run',
+//         frameRate: 10,
+//         frames: this.anims.generateFrameNames('player', {
+//             start: 0,
+//             end: 5,
+//             prefix: 'knight_run_anim_f',
+//             suffix: '.png'
+//         }),
+//         repeat: -1
+//     });
 
-    const characters = this.cache.json.get("characters")
-
-    const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
-    const tileset = map.addTilesetImage('dungeon', 'tiles');
-    this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
-    const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
-    const stairs = map.createLayer('Stairs', tileset, 0,0);
-    const walls = map.createLayer('Walls', tileset, 0,0);
-    const extra = map.createLayer('Extra', tileset, 0,0);
-
-    walls.setCollisionByProperty({ collides: true });
-    this.matter.world.convertTilemapLayer(walls);
-    
-    
-    this.player = this.matter.add.sprite(100, 125, 'player')
-    .setBody(characters.knight)
-    .setScale(2)
-    .play('player_idle')
-    .setFixedRotation();
-  
-    this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
-    .setBody(characters.minotaur)
-    .play('minotaur_idle')
-    .setFixedRotation();
-    
-    // FOV
-    // this.vision = this.make.image({
-    //     x: this.player.x,
-    //     y: this.player.y,
-    //     key: 'vision',
-    //     add: false
-    // });
-    
-    // this.vision.scale = 1;
-    
-    const width = this.scale.width
-    const height = this.scale.height
-    
-    this.rt = this.make.renderTexture({
-        width,
-        height
-    }, true);
+//     this.anims.create({
+//         key: 'player_attack',
+//         frameRate: 3,
+//         frames: this.anims.generateFrameNames('attack', {
+//             frames: [0,1,2 ]}),
+//         frameRate: 3,
+//         repeat: 0
+//     });
 
 
-    
-    // Health Bar
-    let healthBar = new HealthBar(gameScene, 20 , 200);
-    
-    let myScene = this.scene
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
-            let dead = healthBar.decrease(10);
-            // end game
-            if (dead) { 
-                myScene.pause();
-                gameOver.visible = true;
+//     this.matter.world.disableGravity();
+//     this.cursors = this.input.keyboard.createCursorKeys();
 
-             }
-        }
-    });
+//     const characters = this.cache.json.get("characters")
 
-    gameOver = this.add.image(700,150,'gameOver');
-    gameOver.setScale(0.1);
-    gameOver.setOrigin(0.5);
-    gameOver.visible = false;
-    tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
-    tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
-    tutorialText2.visible = false;
+//     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
+//     const tileset = map.addTilesetImage('dungeon', 'tiles');
+//     this.stoneFloor = map.createLayer('StoneFloor', tileset, 0,0)
+//     const dirtFloor = map.createLayer('DirtFloor', tileset, 0,0)
+//     const stairs = map.createLayer('Stairs', tileset, 0,0);
+//     const walls = map.createLayer('Walls', tileset, 0,0);
+//     const extra = map.createLayer('Extra', tileset, 0,0);
 
-    this.cameras.main.startFollow(this.player);
-
-    if (this.cursors.space.isDown)
-    {
-        console.log('hello');
-    }
-}
-
-gameScene2.update = function() {
-    // console.log('x', this.player.x, 'y',this.player.y);
-
-    let myScene = this.scene
-
-    if ( 774 < this.player.x && this.player.x < 870 && 863 < this.player.y && this.player.y < 990 ){
-        console.log('hello');
-        console.log('x', this.player.x, 'y',this.player.y);
-        myScene.start(gameScene2);
-    }
-
-    // this.vision.x = this.player.x
-    // this.vision.y = this.player.y
-    
-
-    let speed = 3;
-
-    
-    if (this.cursors.right.isDown) {
-        this.player.flipX = false
-        this.player.setVelocityX(speed);
-		this.player.play('player_run', true);
-        tutorialText.setVisible(false);
-        tutorialText2.visible = true;
-
-    } else if (this.cursors.left.isDown) {
-        this.player.flipX = true
-        this.player.setVelocityX(-speed);
-		this.player.play('player_run', true);
-        tutorialText.setVisible(false);
-        tutorialText2.visible = true;
-        
-    } else if (this.cursors.up.isDown) {
-        this.player.setVelocityY(-speed);
-		this.player.play('player_run', true);
-        tutorialText.setVisible(false);
-        tutorialText2.visible = true;
-        
-    } else if (this.cursors.down.isDown) {
-        this.player.setVelocityY(speed);
-		this.player.play('player_run', true);
-        tutorialText.setVisible(false);
-        tutorialText2.visible = true;
-        
-    } else {
-
-        this.player.setVelocity(0, 0)
-        this.player.play('player_idle', true)
-
-    };
+//     walls.setCollisionByProperty({ collides: true });
+//     this.matter.world.convertTilemapLayer(walls);
 
 
-    if (this.cursors.space.isDown)
-    {
-        this.player.play('player_attack',true);
-        // remove tutorial text after first attack
-        tutorialText2.visible = false;
-        tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
+//     this.player = this.matter.add.sprite(100, 125, 'player')
+//     .setBody(characters.knight)
+//     .setScale(2)
+//     .play('player_idle')
+//     .setFixedRotation();
 
-    }
+//     this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
+//     .setBody(characters.minotaur)
+//     .play('minotaur_idle')
+//     .setFixedRotation();
 
-    let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
-    this.minotaur.setVelocity(velX, velY);
+//     // FOV
+//     // this.vision = this.make.image({
+//     //     x: this.player.x,
+//     //     y: this.player.y,
+//     //     key: 'vision',
+//     //     add: false
+//     // });
 
-};
+//     // this.vision.scale = 1;
 
-gameScene2.enemyFollows = function(from, to, speed = .5) {
+//     const width = this.scale.width
+//     const height = this.scale.height
 
-    const direction = Math.atan((to.x - from.x) / (to.y - from.y));
-    const speed2 = to.y >= from.y ? speed : -speed;
+//     this.rt = this.make.renderTexture({
+//         width,
+//         height
+//     }, true);
 
-    return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
-};
+
+
+//     // Health Bar
+//     let healthBar = new HealthBar(gameScene, 20 , 200);
+
+//     let myScene = this.scene
+//     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
+//         if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
+//             let dead = healthBar.decrease(10);
+//             // end game
+//             if (dead) {
+//                 myScene.pause();
+//                 gameOver.visible = true;
+
+//              }
+//         }
+//     });
+
+//     gameOver = this.add.image(700,150,'gameOver');
+//     gameOver.setScale(0.1);
+//     gameOver.setOrigin(0.5);
+//     gameOver.visible = false;
+//     tutorialText = this.add.text(16, 16, 'Use the arrow keys to move around!', { fontSize: '32px', fill: '#FFFFFF' });
+//     tutorialText2 = this.add.text(16, 16, 'Use space to attack!', { fontSize: '32px', fill: '#FFFFFF' });
+//     tutorialText2.visible = false;
+
+//     this.cameras.main.startFollow(this.player);
+
+//     if (this.cursors.space.isDown)
+//     {
+//         console.log('hello');
+//     }
+// }
+
+// gameScene2.update = function() {
+//     // console.log('x', this.player.x, 'y',this.player.y);
+
+//     let myScene = this.scene
+
+//     if ( 774 < this.player.x && this.player.x < 870 && 863 < this.player.y && this.player.y < 990 ){
+//         console.log('hello');
+//         console.log('x', this.player.x, 'y',this.player.y);
+//         myScene.start(gameScene2);
+//     }
+
+//     // this.vision.x = this.player.x
+//     // this.vision.y = this.player.y
+
+
+//     let speed = 3;
+
+
+//     if (this.cursors.right.isDown) {
+//         this.player.flipX = false
+//         this.player.setVelocityX(speed);
+// 		this.player.play('player_run', true);
+//         tutorialText.setVisible(false);
+//         tutorialText2.visible = true;
+
+//     } else if (this.cursors.left.isDown) {
+//         this.player.flipX = true
+//         this.player.setVelocityX(-speed);
+// 		this.player.play('player_run', true);
+//         tutorialText.setVisible(false);
+//         tutorialText2.visible = true;
+
+//     } else if (this.cursors.up.isDown) {
+//         this.player.setVelocityY(-speed);
+// 		this.player.play('player_run', true);
+//         tutorialText.setVisible(false);
+//         tutorialText2.visible = true;
+
+//     } else if (this.cursors.down.isDown) {
+//         this.player.setVelocityY(speed);
+// 		this.player.play('player_run', true);
+//         tutorialText.setVisible(false);
+//         tutorialText2.visible = true;
+
+//     } else {
+
+//         this.player.setVelocity(0, 0)
+//         this.player.play('player_idle', true)
+
+//     };
+
+
+//     if (this.cursors.space.isDown)
+//     {
+//         this.player.play('player_attack',true);
+//         // remove tutorial text after first attack
+//         tutorialText2.visible = false;
+//         tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
+
+//     }
+
+//     let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
+//     this.minotaur.setVelocity(velX, velY);
+
+// };
+
+// gameScene2.enemyFollows = function(from, to, speed = .5) {
+
+//     const direction = Math.atan((to.x - from.x) / (to.y - from.y));
+//     const speed2 = to.y >= from.y ? speed : -speed;
+
+//     return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
+// };
 
 
 // gameScene3.init = function() {
@@ -575,13 +686,13 @@ gameScene2.enemyFollows = function(from, to, speed = .5) {
 // };
 
 // gameScene3.create = function() {
-    
+
 //     this.anims.create({
 //         key: 'player_idle',
 //         frameRate: 10,
-//         frames: this.anims.generateFrameNames('player', { 
-//             start: 1, 
-//             end: 5, 
+//         frames: this.anims.generateFrameNames('player', {
+//             start: 1,
+//             end: 5,
 //             prefix: 'knight_idle_anim_f',
 //             suffix: '.png'
 //         }),
@@ -591,15 +702,15 @@ gameScene2.enemyFollows = function(from, to, speed = .5) {
 //     this.anims.create({
 //         key: 'minotaur_idle',
 //         frameRate: 10,
-//         frames: this.anims.generateFrameNames('minotaur', { 
-//             start: 0, 
-//             end: 4, 
+//         frames: this.anims.generateFrameNames('minotaur', {
+//             start: 0,
+//             end: 4,
 //             prefix: 'tile00',
 //             suffix: '.png'
 //         }),
 //         repeat: -1
 //     });
-    
+
 //     this.anims.create({
 //         key: 'player_run',
 //         frameRate: 10,
@@ -620,7 +731,7 @@ gameScene2.enemyFollows = function(from, to, speed = .5) {
 //         frameRate: 3,
 //         repeat: 0
 //     });
- 
+
 
 //     this.matter.world.disableGravity();
 //     this.cursors = this.input.keyboard.createCursorKeys();
@@ -637,19 +748,19 @@ gameScene2.enemyFollows = function(from, to, speed = .5) {
 
 //     walls.setCollisionByProperty({ collides: true });
 //     this.matter.world.convertTilemapLayer(walls);
-    
-    
+
+
 //     this.player = this.matter.add.sprite(100, 125, 'player')
 //     .setBody(characters.knight)
 //     .setScale(2)
 //     .play('player_idle')
 //     .setFixedRotation();
-  
+
 //     this.minotaur = this.matter.add.sprite(400, 125, 'minotaur')
 //     .setBody(characters.minotaur)
 //     .play('minotaur_idle')
 //     .setFixedRotation();
-    
+
 //     FOV
 //     this.vision = this.make.image({
 //         x: this.player.x,
@@ -657,28 +768,28 @@ gameScene2.enemyFollows = function(from, to, speed = .5) {
 //         key: 'vision',
 //         add: false
 //     });
-    
+
 //     this.vision.scale = 1;
-    
+
 //     const width = this.scale.width
 //     const height = this.scale.height
-    
+
 //     this.rt = this.make.renderTexture({
 //         width,
 //         height
 //     }, true);
 
 
-    
+
 //     // Health Bar
 //     let healthBar = new HealthBar(gameScene, 20 , 200);
-    
+
 //     let myScene = this.scene
 //     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
 //         if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {
 //             let dead = healthBar.decrease(10);
 //             // end game
-//             if (dead) { 
+//             if (dead) {
 //                 myScene.pause();
 //                 gameOver.visible = true;
 
@@ -718,8 +829,8 @@ const config = {
         // Center vertically and horizontally
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-	
-    scene: [gameScene, gameScene2],
+
+    scene: gameScene,
 	physics: {
 		default: 'matter',
 		matter: {
