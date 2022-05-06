@@ -4,6 +4,14 @@ let gameScene2 = new Phaser.Scene('Game2');
 
 let gameScene3 = new Phaser.Scene('Game3');
 
+import { Mrpas } from 'mrpas'
+
+
+class Monsters{
+    constructor(){        
+    }
+}
+
 class HealthBar {
 
     constructor (gameScene, x, y)
@@ -70,6 +78,7 @@ class HealthBar {
 gameScene.init = function() {
 
     this.player;
+    this.rt;
     this.minotaur;
     this.goblin;
     this.goblin2;
@@ -192,7 +201,7 @@ gameScene.create = function() {
 
 
 
-
+    //create level and layers
     this.matter.world.disableGravity();
     this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -294,7 +303,6 @@ gameScene.create = function() {
     }, true);
 
 
-
     
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
         if ((bodyA.label == "knight" && bodyB.label == "goblin") || (bodyB.label == "knight" && bodyA.label == "goblin")) {
@@ -337,6 +345,21 @@ gameScene.create = function() {
 
 gameScene.update = function() {
     // console.log('x', this.player.x, 'y',this.player.y);
+
+
+        // // FOV
+        this.rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
+        this.rt.mask.invertAlpha = true;    
+        
+        this.rt.fill(0x000000, 1);
+        this.rt.draw(this.stoneFloor);
+        this.rt.setTint(0x0a2948);
+    
+        this.vision.x = this.player.x
+        this.vision.y = this.player.y
+
+    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+
 
     let myScene = this.scene
     //go to next level
@@ -399,29 +422,30 @@ gameScene.update = function() {
     }
     // go through array of enemies of set their velocity
 
-
+    //beginning of possibly how attacking works
+    //check if attack animation is on
     if (this.player.anims.getName()  == 'player_attack') {
-        console.log('Player is attacking')
+        console.log('Player is attacking');
       
-    }
-
-    let healthBar = new HealthBar(gameScene, 200 , 400);
-
-
-
-
-
-    const Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+    }    
 
     for (elements of Enemies){
         // make velocity an array and assign array values to enemy x and y velocity
         velocity = this.enemyFollows(elements, this.player);
+        // if (elements  == this.minotaur){
+        //     d = velocity[2]
+        //     console.log(d);
+        //     if ((d > -0.22 && d < 1.5) || d){
+        //         console.log('damage')
+        //     }
+        // }
+        
         elements.setVelocity(velocity[0], velocity[1]);
     }
 };
 
 gameScene.enemyFollows = function(from, to, speed = .5) {
-
+    
     const direction = Math.atan((to.x - from.x) / (to.y - from.y));
     // console.log(direction, 'dir')
     const speed2 = to.y >= from.y ? speed : -speed;
