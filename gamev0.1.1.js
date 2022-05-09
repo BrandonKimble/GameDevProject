@@ -4,7 +4,7 @@ let gameScene2 = new Phaser.Scene('Game2');
 
 let gameScene3 = new Phaser.Scene('Game3');
 
-import { Mrpas } from 'mrpas'
+// import { Mrpas } from 'mrpas'
 
 
 class Monsters{
@@ -265,6 +265,25 @@ gameScene.create = function() {
     // .setBody(objects.ladder)
     // .setScale(1.5)
     // .setFixedRotation();
+    
+    // // FOV
+    this.vision = this.make.image({
+        x: this.player.x,
+        y: this.player.y,
+        key: 'vision',
+        add: false
+    });
+    
+    this.vision.scale = .75;
+    
+    const width = this.scale.width;
+    const height =  1600;
+    
+    this.rt = this.make.renderTexture({
+        width,
+        height
+    }, true);
+    
     // Health Bar
     let healthBar = new HealthBar(gameScene, 200 , 400);
 
@@ -284,24 +303,6 @@ gameScene.create = function() {
         }
     });
     console.log('bye')
-    // // FOV
-    this.vision = this.make.image({
-        x: this.player.x,
-        y: this.player.y,
-        key: 'vision',
-        add: false
-    });
-
-    this.vision.scale = .75;
-
-    const width = this.scale.width;
-    const height =  1600;
-
-    this.rt = this.make.renderTexture({
-        width,
-        height
-    }, true);
-
 
     
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
