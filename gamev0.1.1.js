@@ -1,3 +1,5 @@
+let startScene = new Phaser.Scene('start')
+
 let gameScene = new Phaser.Scene('Game');
 
 let gameScene2 = new Phaser.Scene('Game2');
@@ -289,7 +291,6 @@ gameScene.create = function() {
 
     let myScene = this.scene
 
-    console.log('hello')
 
     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
         if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {   
@@ -302,7 +303,7 @@ gameScene.create = function() {
              } 
         }
     });
-    console.log('bye')
+
 
     
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
@@ -455,6 +456,51 @@ gameScene.enemyFollows = function(from, to, speed = .5) {
     // return { velX: speed2 * Math.sin(direction), velY: speed2 * Math.cos(direction) };
 };
 
+
+startScene.init = function() {
+
+    this.start;
+    this.background;
+    this.title;
+    this.scene;
+
+};
+
+startScene.preload = function(){
+    this.load.image('title', 'assets/start.png');
+    this.load.image('bg', 'assets/level_three.png');
+    this.load.image('startButton', 'assets/button.png');
+};
+
+startScene.create = function() {
+    
+    
+    this.startBG = this.add.image(700,150,'bg');
+
+    this.title = this.add.image(900,400,'title');
+
+    title = this.add.text(800, 450, 'By Team13', { fontFamily: 'CustomFont' });
+    
+    // this.title.y=game.height*.15;
+
+    this.startButton = this.add.image(800,700,'startButton');
+
+    this.startButton.setInteractive();
+
+    let myScene = this.scene
+
+    this.input.on('pointerup', function (pointer) {
+
+        this.scene.start('Game');
+
+    }, this);
+    
+
+};
+
+startScene.update = function() {
+
+};
 
 
 //scene 2
@@ -855,7 +901,7 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
 
-    scene: gameScene,
+    scene: [startScene, gameScene],
 	physics: {
 		default: 'matter',
 		matter: {
