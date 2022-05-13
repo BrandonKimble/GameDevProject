@@ -356,28 +356,6 @@ gameScene.update = function() {
     
     isWalking = false;
 
-    // if colliding with minotaur
-    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur" )) {   
-            console.log('damage', healthBars[0])
-            let dead = healthBars[0].decrease(0.5);
-            // end game
-            if (dead) {
-                myScene.pause();
-                gameOver.visible = true;
-             } 
-        }
-        else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
-            console.log('damage slime', healthBars[0])
-            let dead = healthBars[0].decrease(0.5);
-            // end game
-            if (dead) {
-                 myScene.pause();
-                gameOver.visible = true;
-             }
-        }
-    });
-
     //if colliding with goblin
     // this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
     //     if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
@@ -429,14 +407,62 @@ gameScene.update = function() {
 
     };
 
-
+    // HANDLE ATTACK AND COLLISION HERE
     if (this.cursors.space.isDown)
     {
         this.player.play('player_attack',true);
         // remove tutorial text after first attack
         tutorialText2.visible = false;
         tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
+        //this.player.body.offset(25.0,25.0) USE THAT TO ATTACK FROM A DISTANCE
         
+        
+        // TEST ATTACK with minotaur and slime
+        this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+            if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur" )) {   
+                console.log('attacking')
+                if (bodyA.label == "knight") {
+                    //this.minotaur.setVisible(false);
+                }
+                else{
+                    //this.minotaur.setVisible(false);
+                }
+            }
+            else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
+                console.log('attacking slime', healthBars[0])
+                if (bodyA.label == "knight") {
+                    //this.slime.setVisible(false);
+                }
+                else{
+                    //this.slime.setVisible(false);
+                }
+            }
+        });
+        
+
+    }
+    else{
+    // if colliding with minotaur
+        this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+            if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur" )) {   
+                console.log('damage', healthBars[0])
+                let dead = healthBars[0].decrease(0.5);
+                // end game
+                if (dead) {
+                    myScene.pause();
+                    gameOver.visible = true;
+                } 
+            }
+            else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
+                console.log('damage slime', healthBars[0])
+                let dead = healthBars[0].decrease(0.5);
+                // end game
+                if (dead) {
+                    myScene.pause();
+                    gameOver.visible = true;
+                }
+            }
+        });
 
     }
 
