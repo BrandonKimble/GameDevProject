@@ -342,23 +342,24 @@ gameScene.create = function() {
     tutorialText2.setScrollFactor(0,0);
 
     this.cameras.main.startFollow(this.player);
+
+    this.rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
+    this.rt.mask.invertAlpha = true;    
+        
+    this.rt.fill(0x000000, 1);
+    this.rt.draw(this.stoneFloor);
+    this.rt.setTint(0x0a2948); 
 }
 
 
 gameScene.update = function() {
-    // console.log('x', this.player.x, 'y',this.player.y);
-
-
-        // // FOV
-        this.rt.mask = new Phaser.Display.Masks.BitmapMask(this, this.vision);
-        this.rt.mask.invertAlpha = true;    
-        
-        this.rt.fill(0x000000, 1);
-        this.rt.draw(this.stoneFloor);
-        this.rt.setTint(0x0a2948);
+    // console.log('x', this.player.x, 'y',this.player.y);      
     
-        this.vision.x = this.player.x
-        this.vision.y = this.player.y
+	if (this.vision)
+	{
+		this.vision.x = this.player.x
+		this.vision.y = this.player.y
+	}
 
     let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 
@@ -420,15 +421,22 @@ gameScene.update = function() {
         // remove tutorial text after first attack
         tutorialText2.visible = false;
         tutorialText2 = this.add.text(16, 16, '', { fontSize: '32px', fill: '#FFFFFF' });
+        
 
     }
+
     // go through array of enemies of set their velocity
 
     //beginning of possibly how attacking works
     //check if attack animation is on
     if (this.player.anims.getName()  == 'player_attack') {
         console.log('Player is attacking');
-      
+        this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+            if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {   
+                console.log('ahhhhh')
+                
+            }
+        })
     }    
 
     for (elements of Enemies){
@@ -475,7 +483,7 @@ startScene.preload = function(){
 startScene.create = function() {
     
     
-    this.startBG = this.add.image(700,150,'bg');
+    this.startBG = this.add.image(800,300,'bg');
 
     this.title = this.add.image(900,400,'title');
 

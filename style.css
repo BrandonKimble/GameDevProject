@@ -11,5 +11,5 @@ canvas {
 
 @font-face {
     font-family: CustomFont;
-    src: url('./gameFont.ttf');
+    src: url('./assets/gameFont.ttf');
 }
