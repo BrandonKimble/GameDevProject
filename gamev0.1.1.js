@@ -335,8 +335,10 @@ gameScene.create = function() {
     this.rt.setTint(0x0a2948); 
 
 
-    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 }
+
+
+let EnemyHP =[1,1,1,1]
 
 gameScene.update = function() {
     // console.log('x', this.player.x, 'y',this.player.y);      
@@ -429,7 +431,7 @@ gameScene.update = function() {
 
                     Enemies[2].visible = false;
                     Enemies[2].destroy();
-                    Enemies = [Enemies[0], Enemies[1], Enemies[3]]
+                    EnemyHP[2] = 0;
                 }
                 else{
                     //this.minotaur.setVisible(false);
@@ -498,19 +500,15 @@ gameScene.update = function() {
 
     // go through array of enemies to set their velocity
 
-    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+    // let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 
-    //    let Enemies = [[this.goblin1,1], [this.goblin2,1], [this.minotaur,1], [this.slime1,1]];
+    let Enemies = [[this.goblin1,1], [this.goblin2,1], [this.minotaur,1], [this.slime1,1]];
 
     for (elements of Enemies){
         // make velocity an array and assign array values to enemy x and y velocity
 
         velocity = this.enemyFollows(elements, this.player);
-        for (elements of Enemies){
-            // make velocity an array and assign array values to enemy x and y velocity
-            velocity = this.enemyFollows(elements, this.player);
-            elements.setVelocity(velocity[0], velocity[1]);
-        }
+        elements.setVelocity(velocity[0], velocity[1]);
     }
 }; 
 
