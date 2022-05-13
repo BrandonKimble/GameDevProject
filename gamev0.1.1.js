@@ -503,8 +503,12 @@ gameScene.update = function() {
     let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 
     // let Enemies = [[this.goblin1,1], [this.goblin2,1], [this.minotaur,1], [this.slime1,1]];
-
+    count = -1
     for (elements of Enemies){
+        count += 1
+        if (EnemyHP[count] == 0){
+            continue
+        }
         // make velocity an array and assign array values to enemy x and y velocity
         velocity = this.enemyFollows(elements, this.player);
         elements.setVelocity(velocity[0], velocity[1]);
