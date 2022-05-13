@@ -93,10 +93,12 @@ gameScene.init = function() {
     isWalking = false;
     this.attacked = false;
 
-    const Enemies = [this.goblin, this.goblin2, this.minotaur];
 };
 
 var healthBars = [];
+
+var Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+
 
 gameScene.preload = function() {
 
@@ -331,8 +333,10 @@ gameScene.create = function() {
     this.rt.fill(0x000000, 1);
     this.rt.draw(this.stoneFloor);
     this.rt.setTint(0x0a2948); 
-}
 
+
+    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+}
 
 gameScene.update = function() {
     // console.log('x', this.player.x, 'y',this.player.y);      
@@ -343,9 +347,8 @@ gameScene.update = function() {
 		this.vision.y = this.player.y
 	}
 
-    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
-
-
+    // let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+    
     let myScene = this.scene
 
     this.vision.x = this.player.x
@@ -422,7 +425,11 @@ gameScene.update = function() {
             if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur" )) {   
                 console.log('attacking')
                 if (bodyA.label == "knight") {
-                    //this.minotaur.setVisible(false);
+                    console.log('attacked');
+
+                    Enemies[2].visible = false;
+                    Enemies[2].destroy();
+                    Enemies = [Enemies[0], Enemies[1], Enemies[3]]
                 }
                 else{
                     //this.minotaur.setVisible(false);
@@ -465,9 +472,6 @@ gameScene.update = function() {
         });
 
     }
-
-    // go through array of enemies of set their velocity
-
     //beginning of possibly how attacking works
     //check if attack animation is on
     // if (this.player.anims.getName()  == 'player_attack') {
@@ -488,17 +492,33 @@ gameScene.update = function() {
 
     // const Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 
+
+
+
+
+    // go through array of enemies to set their velocity
+
+    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+
+    //    let Enemies = [[this.goblin1,1], [this.goblin2,1], [this.minotaur,1], [this.slime1,1]];
+
     for (elements of Enemies){
         // make velocity an array and assign array values to enemy x and y velocity
+
         velocity = this.enemyFollows(elements, this.player);
-        elements.setVelocity(velocity[0], velocity[1]);
+        for (elements of Enemies){
+            // make velocity an array and assign array values to enemy x and y velocity
+            velocity = this.enemyFollows(elements, this.player);
+            elements.setVelocity(velocity[0], velocity[1]);
+        }
     }
-};
+}; 
+
+
 
 gameScene.enemyFollows = function(from, to, speed = .5) {
-    
+
     const direction = Math.atan((to.x - from.x) / (to.y - from.y));
-    // console.log(direction, 'dir')
     const speed2 = to.y >= from.y ? speed : -speed;
     //return velocity as an array and then assign each value to x and y
     return [speed2 * Math.sin(direction), speed2 * Math.cos(direction),direction]
@@ -506,6 +526,7 @@ gameScene.enemyFollows = function(from, to, speed = .5) {
 };
 
 
+//start screen
 startScene.init = function() {
 
     this.start;
