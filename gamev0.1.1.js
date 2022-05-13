@@ -266,11 +266,11 @@ gameScene.create = function() {
     .play('goblin_idle')
     .setFixedRotation();
 
-    this.goblin2 = this.matter.add.sprite(900, 900, 'goblin_anim')
-    .setBody(Goblin.Goblin)
-    .setScale(2)
-    .play('goblin_idle')
-    .setFixedRotation();
+    // this.goblin2 = this.matter.add.sprite(900, 900, 'goblin_anim')
+    // .setBody(Goblin.Goblin)
+    // .setScale(2)
+    // .play('goblin_idle')
+    // .setFixedRotation();
 
 
     
@@ -338,7 +338,7 @@ gameScene.create = function() {
 }
 
 
-let EnemyHP =[1,1,1,1]
+let EnemyHP =[1,1,1]
 
 gameScene.update = function() {
     // console.log('x', this.player.x, 'y',this.player.y);      
@@ -429,21 +429,32 @@ gameScene.update = function() {
                 if (bodyA.label == "knight") {
                     console.log('attacked');
 
-                    Enemies[2].visible = false;
-                    Enemies[2].destroy();
-                    EnemyHP[2] = 0;
+                    Enemies[1].visible = false;
+                    Enemies[1].destroy();
+                    EnemyHP[1] = 0;
                 }
                 else{
                     //this.minotaur.setVisible(false);
                 }
             }
-            else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
-                console.log('attacking slime', healthBars[0])
+            else if ((bodyA.label == "knight" && bodyB.label == "Goblin") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
                 if (bodyA.label == "knight") {
-                    //this.slime.setVisible(false);
+                    console.log('attacked');
+
+                    Enemies[0].visible = false;
+                    Enemies[0].destroy();
+                    EnemyHP[0] = 0;
                 }
-                else{
-                    //this.slime.setVisible(false);
+            }
+
+            else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Goblin")) {
+                console.log('attacking goblin', healthBars[0])
+                if (bodyA.label == "knight") {
+                    console.log('attacked');
+
+                    Enemies[2].visible = false;
+                    Enemies[2].destroy();
+                    EnemyHP[2] = 0;
                 }
             }
         });
@@ -464,6 +475,15 @@ gameScene.update = function() {
             }
             else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
                 console.log('damage slime', healthBars[0])
+                let dead = healthBars[0].decrease(0.5);
+                // end game
+                if (dead) {
+                    myScene.pause();
+                    gameOver.visible = true;
+                }
+            }
+            else if ((bodyA.label == "knight" && bodyB.label == "Goblin") || (bodyB.label == "knight" && bodyA.label == "Goblin")) {
+                console.log('damage goblin', healthBars[0])
                 let dead = healthBars[0].decrease(0.5);
                 // end game
                 if (dead) {
@@ -494,13 +514,9 @@ gameScene.update = function() {
 
     // const Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 
-
-
-
-
     // go through array of enemies to set their velocity
 
-    let Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
+    let Enemies = [this.goblin,this.minotaur, this.slime1];
 
     // let Enemies = [[this.goblin1,1], [this.goblin2,1], [this.minotaur,1], [this.slime1,1]];
     count = -1
