@@ -1,8 +1,8 @@
 {
 	"generator_info": "Shape definitions generated with PhysicsEditor. Visit https://www.codeandweb.com/physicseditor",
-	"goblin_idle_anim_f0": {
+	"Goblin": {
 		"type": "fromPhysicsEditor",
-		"label": "goblin_idle_anim_f0",
+		"label": "Goblin",
 		"isStatic": false,
 		"density": 0.10000000149011612,
 		"restitution": 0,
@@ -16,7 +16,7 @@
 		},
 		"fixtures": [
 			{
-				"label": "",
+				"label": "Goblin",
 				"isSensor": false,
 				"vertices": [
 					[ { "x":5, "y":14 }, { "x":9, "y":14 }, { "x":12, "y":13 }, { "x":13, "y":6 }, { "x":11, "y":1 }, { "x":5, "y":10 } ],
@@ -25,142 +25,6 @@
 					[ { "x":6, "y":1 }, { "x":5, "y":3 }, { "x":5, "y":10 }, { "x":11, "y":1 } ],
 					[ { "x":13, "y":12 }, { "x":13, "y":6 }, { "x":12, "y":13 } ],
 					[ { "x":12, "y":3 }, { "x":11, "y":1 }, { "x":13, "y":6 } ]
-				]
-			}
-		]
-	},
-	"goblin_idle_anim_f1": {
-		"type": "fromPhysicsEditor",
-		"label": "goblin_idle_anim_f1",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":5, "y":14 }, { "x":11, "y":14 }, { "x":12, "y":13 }, { "x":12, "y":3 }, { "x":11, "y":1 }, { "x":5, "y":10 } ],
-					[ { "x":15, "y":3 }, { "x":12, "y":3 }, { "x":13, "y":6 }, { "x":15, "y":5 } ],
-					[ { "x":2, "y":3 }, { "x":3, "y":9 }, { "x":5, "y":10 }, { "x":5, "y":3 } ],
-					[ { "x":6, "y":1 }, { "x":5, "y":3 }, { "x":5, "y":10 }, { "x":11, "y":1 } ],
-					[ { "x":13, "y":12 }, { "x":13, "y":6 }, { "x":12, "y":3 }, { "x":12, "y":13 } ]
-				]
-			}
-		]
-	},
-	"goblin_idle_anim_f3": {
-		"type": "fromPhysicsEditor",
-		"label": "goblin_idle_anim_f3",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":5, "y":14 }, { "x":11, "y":14 }, { "x":12, "y":13 }, { "x":12, "y":4 }, { "x":11, "y":2 }, { "x":5, "y":4 } ],
-					[ { "x":15, "y":4 }, { "x":12, "y":4 }, { "x":13, "y":7 }, { "x":15, "y":6 } ],
-					[ { "x":2, "y":4 }, { "x":3, "y":10 }, { "x":5, "y":11 }, { "x":5, "y":4 } ],
-					[ { "x":6, "y":2 }, { "x":5, "y":4 }, { "x":11, "y":2 } ],
-					[ { "x":13, "y":12 }, { "x":13, "y":7 }, { "x":12, "y":4 }, { "x":12, "y":13 } ]
-				]
-			}
-		]
-	},
-	"goblin_idle_anim_f2": {
-		"type": "fromPhysicsEditor",
-		"label": "goblin_idle_anim_f2",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":5, "y":14 }, { "x":11, "y":14 }, { "x":12, "y":13 }, { "x":12, "y":4 }, { "x":11, "y":2 }, { "x":5, "y":4 } ],
-					[ { "x":15, "y":4 }, { "x":12, "y":4 }, { "x":13, "y":7 }, { "x":15, "y":6 } ],
-					[ { "x":2, "y":4 }, { "x":3, "y":10 }, { "x":5, "y":11 }, { "x":5, "y":4 } ],
-					[ { "x":6, "y":2 }, { "x":5, "y":4 }, { "x":11, "y":2 } ],
-					[ { "x":13, "y":12 }, { "x":13, "y":7 }, { "x":12, "y":4 }, { "x":12, "y":13 } ]
-				]
-			}
-		]
-	},
-	"goblin_idle_anim_f4": {
-		"type": "fromPhysicsEditor",
-		"label": "goblin_idle_anim_f4",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":5, "y":14 }, { "x":11, "y":14 }, { "x":13, "y":12 }, { "x":5, "y":10 } ],
-					[ { "x":15, "y":7 }, { "x":15, "y":5 }, { "x":11, "y":1 }, { "x":6, "y":1 }, { "x":2, "y":5 }, { "x":13, "y":7 } ],
-					[ { "x":13, "y":7 }, { "x":2, "y":5 }, { "x":3, "y":9 }, { "x":5, "y":10 }, { "x":13, "y":12 } ]
-				]
-			}
-		]
-	},
-	"goblin_idle_anim_f5": {
-		"type": "fromPhysicsEditor",
-		"label": "goblin_idle_anim_f5",
-		"isStatic": false,
-		"density": 0.10000000149011612,
-		"restitution": 0,
-		"friction": 0.10000000149011612,
-		"frictionAir": 0.009999999776482582,
-		"frictionStatic": 0.5,
-		"collisionFilter": {
-			"group": 0,
-			"category": 1,
-			"mask": 255
-		},
-		"fixtures": [
-			{
-				"label": "",
-				"isSensor": false,
-				"vertices": [
-					[ { "x":5, "y":14 }, { "x":11, "y":14 }, { "x":13, "y":12 }, { "x":5, "y":10 } ],
-					[ { "x":15, "y":7 }, { "x":15, "y":5 }, { "x":11, "y":1 }, { "x":6, "y":1 }, { "x":2, "y":5 }, { "x":13, "y":7 } ],
-					[ { "x":13, "y":7 }, { "x":2, "y":5 }, { "x":3, "y":9 }, { "x":5, "y":10 }, { "x":13, "y":12 } ]
 				]
 			}
 		]

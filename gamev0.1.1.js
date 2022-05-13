@@ -89,9 +89,14 @@ gameScene.init = function() {
     this.healthBar;
     this.health;
     this.exit;
+    this.footstep;
+    isWalking = false;
+    this.attacked = false;
 
     const Enemies = [this.goblin, this.goblin2, this.minotaur];
 };
+
+var healthBars = [];
 
 gameScene.preload = function() {
 
@@ -111,6 +116,9 @@ gameScene.preload = function() {
     this.load.json('Goblin', 'assets/goblin.json');
     this.load.json('Slime', 'assets/slime_box.json');
     this.load.json('objects', 'assets/objects.json');
+
+    this.load.audio('footsteps', 'assets/sounds/foootsteps (1).mp3')
+    this.load.audio('music','assets/sounds/dungeonMusic.mp3')
 };
 
 gameScene.create = function() {
@@ -149,7 +157,7 @@ gameScene.create = function() {
         repeat: 0
     });
 
-    //goblin anims
+    //minotaur anims
     this.anims.create({
         key: 'minotaur_idle',
         frameRate: 10,
@@ -200,19 +208,28 @@ gameScene.create = function() {
     });
 
 
+    this.footstep = this.sound.add('footsteps')
+
+    this.music = this.sound.add('music')
 
 
+
+    this.music = this.sound.add("music", { 
+        volume: 1, 
+        loop: true 
+      });
+    this.music.play();
 
     //create level and layers
     this.matter.world.disableGravity();
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    const characters = this.cache.json.get("characters")
+    const characters = this.cache.json.get("characters");
 
-    const Goblin = this.cache.json.get("Goblin")
-    const Slime = this.cache.json.get("Slime")
+    const Goblin = this.cache.json.get("Goblin");
+    const Slime = this.cache.json.get("Slime");
 
-    const objects = this.cache.json.get("objects")
+    // const objects = this.cache.json.get("objects")
 
     const map = this.make.tilemap({ key: 'map', tileWidth: 32, tileHeight:32 });
     const tileset = map.addTilesetImage('dungeon', 'tiles');
@@ -241,14 +258,14 @@ gameScene.create = function() {
     .play('minotaur_idle')
     .setFixedRotation();
 
-    this.goblin = this.matter.add.sprite(800, 900, 'goblin_anim')
-    .setBody(Goblin.goblin)
+    this.goblin = this.matter.add.sprite(800, 900, 'goblin_run')
+    .setBody(Goblin.Goblin)
     .setScale(2)
     .play('goblin_idle')
     .setFixedRotation();
 
     this.goblin2 = this.matter.add.sprite(900, 900, 'goblin_anim')
-    .setBody(Goblin.goblin)
+    .setBody(Goblin.Goblin)
     .setScale(2)
     .play('goblin_idle')
     .setFixedRotation();
@@ -256,7 +273,7 @@ gameScene.create = function() {
 
     
     this.slime1 = this.matter.add.sprite(300, 700, 'slime_anim')
-    .setBody(Slime.slime)
+    .setBody(Slime.Slime)
     .setScale(2)
     .play('slime_anim')
     .setFixedRotation();
@@ -286,49 +303,14 @@ gameScene.create = function() {
         height
     }, true);
     
-    // Health Bar
-    let healthBar = new HealthBar(gameScene, 200 , 400);
+    // add Health Bar to a global array in order to access in it the update function
+    var healthBar = new HealthBar(gameScene, 200 , 400);
+
+    healthBars.push(healthBar);
+
+    console.log(healthBars[0])
 
     let myScene = this.scene
-
-
-    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {   
-            console.log('damage', healthBar)
-            let dead = healthBar.decrease(10);
-            // end game
-            if (dead) {
-                myScene.pause();
-                gameOver.visible = true;
-             } 
-        }
-    });
-
-
-    
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "goblin") || (bodyB.label == "knight" && bodyA.label == "goblin")) {
-            console.log('damage')
-            let dead = healthBar.decrease(10);
-            // end game
-            if (dead) {
-                 myScene.pause();
-                gameOver.visible = true;
-             }
-        }
-    });
-
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
-        if ((bodyA.label == "knight" && bodyB.label == "slime") || (bodyB.label == "knight" && bodyA.label == "slime")) {
-            console.log('damage')
-            let dead = healthBar.decrease(10);
-            // end game
-            if (dead) {
-                 myScene.pause();
-                gameOver.visible = true;
-             }
-        }
-    });
     
 
     gameOver = this.add.image(700,150,'gameOver');
@@ -365,27 +347,59 @@ gameScene.update = function() {
 
 
     let myScene = this.scene
-    //go to next level
-    // if ( 774 < this.player.x && this.player.x < 870 && 863 < this.player.y && this.player.y < 990 ){
-    //     console.log('hello');
-    //     console.log('x', this.player.x, 'y',this.player.y);
-    //     myScene.restart();
-    //     myScene.start(gameScene2);
-    // }
 
     this.vision.x = this.player.x
     this.vision.y = this.player.y
 
 
     let speed = 3;
+    
+    isWalking = false;
+
+    // if colliding with minotaur
+    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+        if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur" )) {   
+            console.log('damage', healthBars[0])
+            let dead = healthBars[0].decrease(0.5);
+            // end game
+            if (dead) {
+                myScene.pause();
+                gameOver.visible = true;
+             } 
+        }
+        else if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
+            console.log('damage slime', healthBars[0])
+            let dead = healthBars[0].decrease(0.5);
+            // end game
+            if (dead) {
+                 myScene.pause();
+                gameOver.visible = true;
+             }
+        }
+    });
+
+    //if colliding with goblin
+    // this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {
+    //     if ((bodyA.label == "knight" && bodyB.label == "Slime") || (bodyB.label == "knight" && bodyA.label == "Slime")) {
+    //         console.log('damage slime', healthBars[0])
+    //         let dead = healthBars[0].decrease(0.5);
+    //         // end game
+    //         if (dead) {
+    //              myScene.pause();
+    //             gameOver.visible = true;
+    //          }
+    //     }
+    // });
 
 
-    if (this.cursors.right.isDown) {
+    if (this.cursors.right.isDown && isWalking == false) {
         this.player.flipX = false
         this.player.setVelocityX(speed);
 		this.player.play('player_run', true);
         tutorialText.setVisible(false);
         tutorialText2.visible = true;
+        // this.footstep.play();
+        isWalking = true;
 
     } 
     else if (this.cursors.left.isDown) {
@@ -408,7 +422,8 @@ gameScene.update = function() {
         tutorialText2.visible = true;
 
     } else {
-
+        // this.footstep.stop();       
+        this.isWalking = false;
         this.player.setVelocity(0, 0)
         this.player.play('player_idle', true)
 
@@ -429,27 +444,27 @@ gameScene.update = function() {
 
     //beginning of possibly how attacking works
     //check if attack animation is on
-    if (this.player.anims.getName()  == 'player_attack') {
-        console.log('Player is attacking');
-        this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-            if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {   
-                console.log('ahhhhh')
+    // if (this.player.anims.getName()  == 'player_attack') {
+    //     console.log('Player is attacking');
+    //     this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+    //         if ((bodyA.label == "knight" && bodyB.label == "minotaur") || (bodyB.label == "knight" && bodyA.label == "minotaur")) {   
+    //             console.log('ahhhhh')
                 
-            }
-        })
-    }    
+    //         }
+    //     })
+    // }    
+
+
+    // let { velX, velY } = this.enemyFollows(this.minotaur, this.player);
+    // this.minotaur.setVelocity(velX, velY);
+    // let { velX1, velY1 } = this.enemyFollows(this.goblin, this.player);
+    // this.goblin2.setVelocity(velX1, velY1);
+
+    // const Enemies = [this.goblin, this.goblin2, this.minotaur, this.slime1];
 
     for (elements of Enemies){
         // make velocity an array and assign array values to enemy x and y velocity
         velocity = this.enemyFollows(elements, this.player);
-        // if (elements  == this.minotaur){
-        //     d = velocity[2]
-        //     console.log(d);
-        //     if ((d > -0.22 && d < 1.5) || d){
-        //         console.log('damage')
-        //     }
-        // }
-        
         elements.setVelocity(velocity[0], velocity[1]);
     }
 };
@@ -478,6 +493,7 @@ startScene.preload = function(){
     this.load.image('title', 'assets/start.png');
     this.load.image('bg', 'assets/level_three.png');
     this.load.image('startButton', 'assets/button.png');
+    this.load.audio('music','assets/sounds/dungeonMusic.mp3')
 };
 
 startScene.create = function() {
@@ -493,15 +509,20 @@ startScene.create = function() {
 
     this.startButton = this.add.image(800,700,'startButton');
 
-    this.startButton.setInteractive();
+    this.title.setInteractive();
 
     let myScene = this.scene
 
     this.input.on('pointerup', function (pointer) {
+        this.music.stop();
 
         this.scene.start('Game');
 
     }, this);
+
+    this.music = this.sound.add('music')
+
+    this.music.play();
     
 
 };
