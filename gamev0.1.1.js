@@ -2,6 +2,8 @@ let startScene = new Phaser.Scene('start')
 
 let gameScene = new Phaser.Scene('Game');
 
+let credits = new Phaser.Scene('credits');
+
 let gameScene2 = new Phaser.Scene('Game2');
 
 let gameScene3 = new Phaser.Scene('Game3');
@@ -432,6 +434,9 @@ gameScene.update = function() {
                     Enemies[1].visible = false;
                     Enemies[1].destroy();
                     EnemyHP[1] = 0;
+                    if( EnemyHP[0] == 0 && EnemyHP[2] == 0){
+                        myScene.start('credits')
+                    }
                 }
                 else{
                     //this.minotaur.setVisible(false);
@@ -444,6 +449,9 @@ gameScene.update = function() {
                     Enemies[0].visible = false;
                     Enemies[0].destroy();
                     EnemyHP[0] = 0;
+                    if( EnemyHP[1] == 0 && EnemyHP[2] == 0){
+                        myScene.start('credits')
+                    }
                 }
             }
 
@@ -455,6 +463,9 @@ gameScene.update = function() {
                     Enemies[2].visible = false;
                     Enemies[2].destroy();
                     EnemyHP[2] = 0;
+                    if( EnemyHP[0] == 0 && EnemyHP[1] == 0){
+                        myScene.start('credits')
+                    }
                 }
             }
         });
@@ -611,6 +622,48 @@ startScene.create = function() {
 startScene.update = function() {
 
 };
+
+
+
+//start screen
+credits.init = function() {
+
+    this.start;
+    this.background;
+    this.title;
+    this.scene;
+
+};
+
+credits.preload = function(){
+    this.load.image('bg', 'assets/level_three.png');
+    this.load.audio('music','assets/sounds/dungeonMusic.mp3')
+};
+
+credits.create = function() {
+    
+    
+    this.startBG = this.add.image(800,300,'bg');
+
+
+    title = this.add.text(700, 450, 'Credits', { fontFamily: 'CustomFont', fontSize: 45.0 });
+    subtitle = this.add.text(700, 580, 'Creators:', { fontFamily: 'CustomFont',  fontSize: 24.0 });
+    nathan = this.add.text(700, 650, 'Nathan C.', { fontFamily: 'CustomFont' });
+    brandon = this.add.text(700, 700, 'Brandon K.', { fontFamily: 'CustomFont' });
+    raul = this.add.text(700, 750, 'Raul R.', { fontFamily: 'CustomFont' });
+
+    let myScene = this.scene
+    this.music = this.sound.add('music')
+
+    this.music.play();
+    
+
+};
+
+credits.update = function() {
+
+};
+
 
 
 //scene 2
@@ -1011,7 +1064,7 @@ const config = {
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
 
-    scene: [startScene, gameScene],
+    scene: [startScene, gameScene, credits],
 	physics: {
 		default: 'matter',
 		matter: {
