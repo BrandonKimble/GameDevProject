@@ -529,8 +529,25 @@ gameScene.update = function() {
         velocity = this.enemyFollows(elements, this.player);
         elements.setVelocity(velocity[0], velocity[1]);
     }
+
+
+    //check if all enemies are dead
+    if (this.allAreEqual(EnemyHP)){
+        console.log('win');
+        // roll credits
+        // this.scene.start('credits')
+    }
 }; 
 
+gameScene.allAreEqual = function(array) {
+    const result = array.every(element => {
+      if (element === 0) {
+        return true;
+      }
+    });
+  
+    return result;
+  }
 
 
 gameScene.enemyFollows = function(from, to, speed = .5) {
